@@ -89,7 +89,7 @@ router.post('/add/alumno', (req, res) => {
 
 });
 
-router.get('/login', (req, res) => {
+router.post('/login', (req, res) => {
   const { id, password } = req.body;
   
   mysqlConnection.query('SELECT id FROM Usuario where id=? and password=?',[id,password], (err, rows, fields) => {
