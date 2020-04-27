@@ -91,7 +91,7 @@ router.post('/add/alumno', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { id, password } = req.body;
-  console.log('login body',body);
+  console.log('login body',req.body);
   
   mysqlConnection.query('SELECT id FROM Usuario where id=? and password=?',[id,password], (err, rows, fields) => {
     if(rows.length<1) {
