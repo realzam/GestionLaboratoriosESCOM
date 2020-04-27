@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const mysqlConnection  = require('../database.js');
-
+const helpers=require('./helpers');
 // GET all Employees
 router.get('/', (req, res) => {
   console.log('ruta raiz');
@@ -44,15 +45,16 @@ router.delete('/:id', (req, res) => {
 //1 alumno
 //2 docente
 //3 adminsitrador
-router.post('/add/alumno', (req, res) => {
-  console.log(" add alumno body",req.body);
-  
+router.post('/add/alumno', async (req, res) => {
+  console.log(" add alumno");
   const {id, correo, password} = req.body;
-  console.log(id, correo, password);
+  
+  var finalpass= await helpers.encryptPassword(password);
+
   const query ="select correo from Usuario where correo=?";
   const query2 ="select id from Usuario where id=?";
   const query3 ="insert into  Usuario (id,correo,tipoUsuario,password) values (?,?,?,?)";
-  
+ 
   mysqlConnection.query(query, [correo], (err, rows, fields) => {
     if(rows.length>0) {
       console.log("El correo ya esta en registrado");
@@ -65,7 +67,7 @@ router.post('/add/alumno', (req, res) => {
           res.json({error: "la boleta ya  esta registrada"});
         } else if(!err2){
 
-          mysqlConnection.query(query3, [id,correo,1,password], (err3, rows3, fields3) => {
+          mysqlConnection.query(query3, [id,correo,1,finalpass], (err3, rows3, fields3) => {
             if(!err3) {
               console.log("Usuario guardado");
               res.json({status: "Usuario guardado"});
@@ -89,15 +91,20 @@ router.post('/add/alumno', (req, res) => {
 
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { id, password } = req.body;
-  console.log('login body',req.body);
+  console.log('login');
   
-  mysqlConnection.query('SELECT id FROM Usuario where id=? and password=?',[id,password], (err, rows, fields) => {
+  mysqlConnection.query('SELECT password FROM Usuario where id=?',[id,password], async  (err, rows, fields) => {
     if(rows.length<1) {
       res.json({error: "Usuario o Contraseña incorrecta"});
     }if(!err) {
+      //console.log('rows',rows[0]['password'])
+      const validPass =await helpers.matchPassword(password,rows[0]['password']);
+      if(validPass)
       res.json({status: "ok"});
+      else
+      res.json({error: "Usuario o Contraseña incorrecta"});
     } else {
       console.log(err);
       res.json({error: "ups hubo algun error :("});
