@@ -45,7 +45,7 @@ router.delete('/:id', (req, res) => {
 //2 docente
 //3 adminsitrador
 router.post('/add/alumno', (req, res) => {
-  console.log("body",req.body);
+  console.log(" add alumno body",req.body);
   
   const {id, correo, password} = req.body;
   console.log(id, correo, password);
@@ -91,6 +91,7 @@ router.post('/add/alumno', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { id, password } = req.body;
+  console.log('login body',body);
   
   mysqlConnection.query('SELECT id FROM Usuario where id=? and password=?',[id,password], (err, rows, fields) => {
     if(rows.length<1) {
