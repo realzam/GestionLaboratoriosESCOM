@@ -21,7 +21,6 @@ app.listen(app.get('port'), () => {
 
 let interval = ()=>{
   console.log('hola mundo, no sleep');
-  transporter.sendMail();
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
     if (!error && res.statusCode == 200) {
         
