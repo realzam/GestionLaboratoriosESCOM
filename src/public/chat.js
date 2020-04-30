@@ -27,6 +27,7 @@ let actions=document.getElementById('actions');
 
 
 
+    socket.onclose = function(evt) { alert("Connection closed."); }; //This line is always true
     /*
     sock.onopen=function(event){
         console.log(event) 
