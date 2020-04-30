@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
 const mysqlConnection  = require('../database.js');
 const helpers=require('./helpers');
+const path = require('path');
+
 // GET all Employees
 router.get('/', (req, res) => {
   console.log('ruta raiz');
@@ -32,6 +32,8 @@ router.get('/:id', (req, res) => {
 // DELETE An Employee
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
+  console.log('hola id');
+  
   mysqlConnection.query('DELETE FROM employee WHERE id = ?', [id], (err, rows, fields) => {
     if(!err) {
       res.json({status: 'Employee Deleted'});
@@ -124,5 +126,7 @@ router.put('/modifyAlumno/:id', (req, res) => {
     }
   });
 });
+
+
 
 module.exports = router;
