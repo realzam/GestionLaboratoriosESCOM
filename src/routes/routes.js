@@ -8,7 +8,7 @@ const path = require('path');
 router.get('/', (req, res) => {
   console.log('ruta raiz');
   
-  mysqlConnection.query('SELECT * FROM Laboratorio', (err, rows, fields) => {
+  mysqlConnection.query('select l.*,count(*) as Disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
     if(!err) {
       res.json(rows);
     } else {

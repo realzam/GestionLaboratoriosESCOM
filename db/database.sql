@@ -18,7 +18,7 @@ CREATE TABLE Laboratorio (
 CREATE TABLE Computadora (
   idComputadora INT NOT NULL,
   idLaboratorio INT NOT NULL,
-  PRIMARY KEY(idComputadora),
+  PRIMARY KEY(idComputadoraidLaboratorio,),
   foreign key(idLaboratorio) references Laboratorio(idLaboratorio)
   on delete cascade on update cascade
 );
@@ -34,3 +34,32 @@ CREATE TABLE reservaComputadora (
   foreign key(idComputadora) references Computadora(idComputadora)
   on delete cascade on update cascade
 );
+
+
+CREATE TABLE Hora (
+  idHora INT NOT NULL,
+  inicio time,
+  fin time,
+  PRIMARY KEY(idHora)
+);
+
+CREATE TABLE Dia(
+  idDia INT NOT NULL,
+  dia VARCHAR(10),
+  PRIMARY KEY(idDia)
+);
+
+CREATE TABLE Horario(
+  idHorario INT NOT NULL,
+  clase VARCHAR(30),
+  hora int,
+  dia int,
+  foreign key(hora) references Hora(idHora)
+  on delete cascade on update cascade,
+  foreign key(dia) references Dia(idDia)
+  on delete cascade on update cascade,
+  PRIMARY KEY(idHorario,clase,hora,dia)
+);
+
+
+
