@@ -30,7 +30,7 @@ app.use(require('./routes/views'));
 
 const server=app.listen(app.get('port'), () => {
   console.log('Server on port',app.get('port'));
-  setInterval(interval, 1000*60*3);
+ // setInterval(interval, 1000*60*3);
 });
 
 function heartbeat() {
