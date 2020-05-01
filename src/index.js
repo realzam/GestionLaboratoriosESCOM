@@ -54,8 +54,11 @@ wss.on('connection',function(ws){
 io.on('connection',function(ws){
   CLIENTS.push(ws);
   console.log('cliente nuevo')
- // setInterval(()=>{ws.send(''),console.log('keep alive');}, 1000*6);
-  
+  // ping
+ws.send(0x9);
+// pong
+ws.send(0xA);
+
   ws.on('message',function(obj){
  
       console.log('recived:'+obj)

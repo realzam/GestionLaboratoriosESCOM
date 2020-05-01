@@ -5,6 +5,7 @@ const helpers=require('./helpers');
 const path = require('path');
 
 // GET all Employees
+
 router.get('/', (req, res) => {
   console.log('ruta raiz');
   
@@ -47,7 +48,7 @@ router.put('/modifyLaboratorio/:id', (req, res) => {
     }
   });
 });
-
+/*
 // DELETE An Employee
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
@@ -62,7 +63,7 @@ router.delete('/:id', (req, res) => {
     }
   });
 });
-
+*/
 // INSERT An Employee
 //1 alumno
 //2 docente
