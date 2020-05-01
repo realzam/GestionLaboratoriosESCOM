@@ -48,19 +48,30 @@ wss.on('connection',function(ws){
 });
 */
 
+function heartbeat() {
+  clearTimeout(this.pingTimeout);
 
+  // Use `WebSocket#terminate()`, which immediately destroys the connection,
+  // instead of `WebSocket#close()`, which waits for the close timer.
+  // Delay should be equal to the interval at which your server
+  // sends out pings plus a conservative assumption of the latency.
+  this.pingTimeout = setTimeout(() => {
+    this.terminate();
+  }, 30000 + 1000);
+}
 
+io.on('open', heartbeat);
+io.on('ping', heartbeat);
+io.on('close', function clear() {
+  clearTimeout(this.pingTimeout);
+});
 
 io.on('connection',function(ws){
   CLIENTS.push(ws);
   console.log('cliente nuevo')
-  // ping
-ws.send(0x9);
-// pong
-ws.send(0xA);
 
   ws.on('message',function(obj){
- 
+
       console.log('recived:'+obj)
       if(obj=="/labs")
       {
