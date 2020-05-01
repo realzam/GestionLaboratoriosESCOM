@@ -21,7 +21,7 @@ let actions=document.getElementById('actions');
             message:message.value
         }
         var myJSON = JSON.stringify(user);
-        socket.send(myJSON );
+        socket.send(message.value);
 
     })
 

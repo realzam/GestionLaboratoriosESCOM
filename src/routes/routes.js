@@ -17,14 +17,33 @@ router.get('/', (req, res) => {
   });  
 });
 
-// GET An Employee
-router.get('/:id', (req, res) => {
-  const { id } = req.params; 
-  mysqlConnection.query('SELECT * FROM Usuario WHERE id = ?', [id], (err, rows, fields) => {
+
+router.put('/modifyComputadora/:id', (req, res) => {
+
+  const { id } = req.params;
+
+  const {lab, edo} = req.body;
+  mysqlConnection.query('update Computadora set estado = ? where idComputadora=? and idLaboratorio=?', [edo,id,lab], (err, rows, fields) => {
     if (!err) {
-      res.json(rows[0]);
+      res.json({status: "Computadora modificada"});
     } else {
       console.log(err);
+      res.json({error: "ups hubo algun error :("});
+    }
+  });
+});
+
+router.put('/modifyLaboratorio/:id', (req, res) => {
+
+  const { id } = req.params;
+
+  const {edo} = req.body;
+  mysqlConnection.query('update Laboratorio set estado = ? where idLaboratorio=?', [edo,id], (err, rows, fields) => {
+    if (!err) {
+      res.json({status: "Laboratorio modificado"});
+    } else {
+      console.log(err);
+      res.json({error: "ups hubo algun error :("});
     }
   });
 });
@@ -39,6 +58,7 @@ router.delete('/:id', (req, res) => {
       res.json({status: 'Employee Deleted'});
     } else {
       console.log(err);
+      
     }
   });
 });

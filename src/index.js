@@ -1,9 +1,11 @@
 const express = require('express');
-const app = express();
 const request = require('request');
 const path = require('path');
 const WebSocket = require('ws');
+const mysqlConnection  = require('./database.js');
+var bodyParser = require('body-parser');
 
+const app = express();
 // Settings
 
 app.set('port', process.env.PORT || 3000);
@@ -11,6 +13,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // Middlewares
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(bodyParser.urlencoded({ extended: false }))
+
+
+app.use(bodyParser.json())
 //app.use(express.json());
 
 // Routes
@@ -52,7 +59,23 @@ io.on('connection',function(ws){
   ws.on('message',function(obj){
  
       console.log('recived:'+obj)
-      ws.send("Message: " + obj);
+      if(obj=="/labs")
+      {
+
+        mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
+          if(!err) {
+            console.log(JSON.stringify(rows))
+            ws.send(JSON.stringify(rows));
+          } else {
+            console.log(err);
+          }
+        }); 
+
+      }
+      else{
+        ws.send("Message from server: " + obj);
+      }
+      
       sendAll(obj,ws);
   });
   ws.on('close', ()=>{
@@ -63,7 +86,7 @@ io.on('connection',function(ws){
 function sendAll (message,yo) {
   for (var i=0; i<CLIENTS.length; i++) {
     if(CLIENTS[i]!=yo)
-      CLIENTS[i].send("Message: " +message);
+      CLIENTS[i].send("Message from server: " +message);
   }
 }
 
