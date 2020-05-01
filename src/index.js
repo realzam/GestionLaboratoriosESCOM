@@ -1,7 +1,7 @@
 const express = require('express');
 const request = require('request');
 const path = require('path');
-const WebSocket = require('ws');
+const WebSocket= require('ws');
 const mysqlConnection  = require('./database.js');
 var bodyParser = require('body-parser');
 
@@ -23,6 +23,7 @@ app.use(bodyParser.json())
 // Routes
 app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
+const util=require('./utils.js');
 
 // static files
 
@@ -30,8 +31,33 @@ app.use(require('./routes/views'));
 
 const server=app.listen(app.get('port'), () => {
   console.log('Server on port',app.get('port'));
- // setInterval(interval, 1000*60*3);
+  setInterval(interval2, 1000*60*3);
 });
+
+function noop() {}
+
+function heartbeat() {
+  this.isAlive = true;
+}
+
+let interval2 = ()=>{
+  console.log('hola mundo, no sleep');
+  request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
+    if (!error && res.statusCode == 200) {
+    }
+});
+
+}
+
+const interval = setInterval(function ping() {
+  io.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, 30000);
+
 
 
 const io = new WebSocket.Server({ server });
@@ -45,51 +71,52 @@ wss.on('connection',function(ws){
 });
 */
 
-function noop() {}
 
-function heartbeat() {
-  this.isAlive = true;
-}
 
-io.on('connection',function(ws){
+io.on('connection',ws =>{
   CLIENTS.push(ws);
   console.log('cliente nuevo')
   ws.isAlive = true;
   ws.on('pong', heartbeat);
-  ws.on('message',function(obj){
-
-      console.log('recived:'+obj)
-      if(obj=="/labs")
+  ws.on('message',async (message)=>{
+    if(message.indexOf('/')!=-1)
+    {
+      var s=message.split('/');
+      var res;
+      switch(s[1])
       {
-
-        mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
-          if(!err) {
-            console.log(JSON.stringify(rows))
-            ws.send(JSON.stringify(rows));
-          } else {
-            console.log(err);
+        case 'labs':
+          res=await util.getLabs('');
+          break;
+        case 'modCompu':
+          var resm=await util.modCompu(s[2],s[3],s[4]);
+          if(resm['ok'])
+          {
+            console.log('mod compu ok mysql')
+            res=await util.getLabs('/modcompu');
+          }else
+          {
+            res=JSON.stringify(resm);
           }
-        }); 
+          
+          break;
+        default:
+          res="comando"
+          break
 
       }
-      else{
-        ws.send("Message from server: " + obj);
-      }
-      
-      sendAll(obj,ws);
+    }else
+    {
+     res="server say"+message
+    }
+    ws.send(res);
+    sendAll(res,ws)
   });
 
 });
 
 
-const interval = setInterval(function ping() {
-  io.clients.forEach(function each(ws) {
-    if (ws.isAlive === false) return ws.terminate();
 
-    ws.isAlive = false;
-    ws.ping(noop);
-  });
-}, 30000);
 
 io.on('close', function close() {
   console.log('websocket closed')
@@ -99,21 +126,9 @@ io.on('close', function close() {
 function sendAll (message,yo) {
   for (var i=0; i<CLIENTS.length; i++) {
     if(CLIENTS[i]!=yo)
-      CLIENTS[i].send("Message from server: " +message);
+      CLIENTS[i].send(message);
   }
 }
 
 
 
-let interval2 = ()=>{
-
-  console.log('hola mundo, no sleep');
-  request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
-    if (!error && res.statusCode == 200) {
-        
-    }
-});
-
-
-
-}

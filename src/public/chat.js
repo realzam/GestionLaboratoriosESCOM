@@ -22,7 +22,7 @@ let actions=document.getElementById('actions');
         }
         var myJSON = JSON.stringify(user);
         socket.send(message.value);
-
+        
     })
 
 
