@@ -48,23 +48,11 @@ wss.on('connection',function(ws){
 });
 */
 
+function noop() {}
+
 function heartbeat() {
-  clearTimeout(this.pingTimeout);
-
-  // Use `WebSocket#terminate()`, which immediately destroys the connection,
-  // instead of `WebSocket#close()`, which waits for the close timer.
-  // Delay should be equal to the interval at which your server
-  // sends out pings plus a conservative assumption of the latency.
-  this.pingTimeout = setTimeout(() => {
-    this.terminate();
-  }, 30000 + 1000);
+  this.isAlive = true;
 }
-
-io.on('open', heartbeat);
-io.on('ping', heartbeat);
-io.on('close', function clear() {
-  clearTimeout(this.pingTimeout);
-});
 
 io.on('connection',function(ws){
   CLIENTS.push(ws);
@@ -92,9 +80,22 @@ io.on('connection',function(ws){
       
       sendAll(obj,ws);
   });
-  ws.on('close', ()=>{
-    console.log('websocket closed')
-    })
+
+});
+
+
+const interval = setInterval(function ping() {
+  io.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, 30000);
+
+io.on('close', function close() {
+  console.log('websocket closed')
+  clearInterval(interval);
 });
 
 function sendAll (message,yo) {
@@ -106,7 +107,7 @@ function sendAll (message,yo) {
 
 
 
-let interval = ()=>{
+let interval2 = ()=>{
 
   console.log('hola mundo, no sleep');
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
