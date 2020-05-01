@@ -33,9 +33,6 @@ const server=app.listen(app.get('port'), () => {
  // setInterval(interval, 1000*60*3);
 });
 
-function heartbeat() {
-  this.isAlive = true;
-}
 
 const io = new WebSocket.Server({ server });
 CLIENTS=[];
@@ -57,7 +54,8 @@ function heartbeat() {
 io.on('connection',function(ws){
   CLIENTS.push(ws);
   console.log('cliente nuevo')
-
+  ws.isAlive = true;
+  ws.on('pong', heartbeat);
   ws.on('message',function(obj){
 
       console.log('recived:'+obj)
