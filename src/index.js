@@ -32,7 +32,7 @@ const util=require('./utils.js');
 
 // Starting the server
 const server=app.listen(app.get('port'), () => {
-  console.log('now',moment(momenttz().tz("America/Mexico_City").format()).format('MMMM Do YYYY, h:mm:ss a'));
+  console.log('now',momenttz().tz("America/Mexico_City").format().format('MMMM Do YYYY, h:mm:ss a'));
   
   console.log('Server on port',app.get('port'));
   setInterval(interval2, 1000*60*3);
