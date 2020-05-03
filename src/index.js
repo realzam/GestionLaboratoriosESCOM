@@ -4,13 +4,16 @@ const path = require('path');
 const WebSocket= require('ws');
 const mysqlConnection  = require('./database.js');
 var bodyParser = require('body-parser');
+const moment = require('moment');
+var momenttz = require('moment-timezone');
 
 const app = express();
 // Settings
-
+moment.locale('es');
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.locals.moment = moment;
 // Middlewares
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -28,8 +31,9 @@ const util=require('./utils.js');
 // static files
 
 // Starting the server
-
 const server=app.listen(app.get('port'), () => {
+  console.log('now',moment(momenttz().tz("America/Mexico_City").format()).format('MMMM Do YYYY, h:mm:ss a'));
+  
   console.log('Server on port',app.get('port'));
   setInterval(interval2, 1000*60*3);
 });
