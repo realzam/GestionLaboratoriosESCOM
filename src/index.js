@@ -2,18 +2,16 @@ const express = require('express');
 const request = require('request');
 const path = require('path');
 const WebSocket= require('ws');
-const mysqlConnection  = require('./database.js');
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const moment = require('moment');
-var momenttz = require('moment-timezone');
-
+const utils=require('./utils.js');
+const peticiones=require('./peticiones.js');
 const app = express();
 // Settings
 moment.locale('es');
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.locals.moment = moment;
 // Middlewares
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,21 +20,54 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
 //app.use(express.json());
-
+var labslist=[1105,1106,1107,2103];
 // Routes
 app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
-const util=require('./utils.js');
-
-// static files
-
-// Starting the server
 const server=app.listen(app.get('port'), () => {
-  console.log('now',momenttz().tz("America/Mexico_City").format('MMMM Do YYYY, h:mm:ss a'));
-  
-  console.log('Server on port',app.get('port'));
+  console.log('now',moment().format('dddd MMMM YYYY H:mm:ss'));
+ // scheduling()
   setInterval(interval2, 1000*60*3);
 });
+
+
+function scheduling()
+{
+  console.log('horario',moment().format('dddd MMMM YYYY H:mm:ss'));
+  var hora;
+  var dia=moment().day()
+  if(dia==6||dia==0)
+ {
+   hora=0;
+ }else{
+  hora=utils.getHoraID(moment())
+ }
+  if(hora==0)
+  {
+    peticiones.setLaboratoriosEdo('No disponible',0);
+    peticiones.setComputadorasEdo('Ocupadas',0);
+  }
+  
+  
+  else if(hora==3||hora==9)
+  {
+    peticiones.setLaboratoriosEdo('Tiempo Libre',0);
+    peticiones.setComputadorasEdo('Disponilbe',0);
+  }
+ 
+  else{
+    for (var i=0;i<labslist.length;i++) {
+  
+      console.log('bd????');
+      
+      peticiones.modEdoLab(hora,labslist[i],dia)
+    }
+  }
+  console.log('nextTimer',utils.nextTimer(moment()).add(1,'second').format('dddd MMMM YYYY H:mm:ss'));
+  timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(moment())-moment()+1000)
+
+
+}
 
 function noop() {}
 
@@ -66,16 +97,6 @@ const interval = setInterval(function ping() {
 
 const io = new WebSocket.Server({ server });
 CLIENTS=[];
-/*
-wss.on('connection',function(ws){
-    ws.on('message',function(message){
-        console.log('recived:'+message);
-        ws.send("From server "+message);
-    });
-});
-*/
-
-
 
 io.on('connection',ws =>{
   CLIENTS.push(ws);
@@ -90,14 +111,14 @@ io.on('connection',ws =>{
       switch(s[1])
       {
         case 'labs':
-          res=await util.getLabs('');
+          res=await peticiones.getLabs('');
           break;
         case 'modCompu':
-          var resm=await util.modCompu(s[2],s[3],s[4]);
+          var resm=await peticiones.modCompu(s[2],s[3],s[4]);
           if(resm['ok'])
           {
             console.log('mod compu ok mysql')
-            res=await util.getLabs('/modcompu');
+            res=await peticiones.getLabs('/modcompu');
           }else
           {
             res=JSON.stringify(resm);
@@ -107,7 +128,6 @@ io.on('connection',ws =>{
         default:
           res="comando"
           break
-
       }
     }else
     {

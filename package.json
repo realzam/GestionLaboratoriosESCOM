@@ -15,11 +15,11 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "ejs": "^3.1.2",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "moment": "^2.25.1",
     "moment-timezone": "^0.5.28",
     "morgan": "^1.10.0",
-    "mysql": "^2.15.0",
+    "mysql": "^2.18.1",
     "nodemailer": "^6.4.6",
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
@@ -27,6 +27,6 @@
     "ws-await": "^4.1.0"
   },
   "devDependencies": {
-    "nodemon": "^1.17.5"
+    "nodemon": "^1.19.4"
   }
 }

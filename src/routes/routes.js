@@ -10,9 +10,16 @@ router.get('/', (req, res) => {
   console.log('ruta raiz');
   
   mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
+    console.log('ruta raiz2');
     if(!err) {
+      var aux=rows;
+     
+      aux[0]["hola"] = "value3";
+      console.log(aux);
       res.json(rows);
+
     } else {
+      console.log('ruta raiz3');
       console.log(err);
     }
   });  
@@ -148,6 +155,28 @@ router.put('/modifyAlumno/:id', (req, res) => {
   });
 });
 
+
+router.post('/reservaComputadora', (req, res) => {
+  console.log('reserva');
+  
+  const {usuario,compu,lab,inicio,dia,hora,fin,edo } = req.body;
+  //insert into ReservaComputadora() values(2015031381,1,2103,'2020-05-05 15:10:00',2,6,'2020-05-05 16:10:00',"usando")
+  const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
+  mysqlConnection.query(query, [usuario,compu,lab,inicio,dia,hora,fin,edo], (err, rows, fields) => {
+    if(!err) {
+      
+      mysqlConnection.query('update Computadora set estado=? where idComputadora=? and idLaboratorio=?', ['Ocupada',compu,lab], (err2, rows2, fields2) => {
+        if(!err2) {}
+        else
+        {
+          res.json({status: "reserva completada"});
+        }
+      });
+    } else {
+      console.log(err);
+    }
+  });
+});
 
 
 module.exports = router;
