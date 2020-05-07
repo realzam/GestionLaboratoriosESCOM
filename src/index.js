@@ -47,7 +47,12 @@ async function scheduling()
   {
     peticiones.setLaboratoriosEdo('Tiempo Libre',0);
     peticiones.setComputadorasEdo('Disponilbe',0);
-  }else{
+  }else if(hora==0)
+  {
+    peticiones.setLaboratoriosEdo('No disponible',0);
+    peticiones.setComputadorasEdo('No Disponilbe',0);
+  }
+  else{
     var labslist=[1105,1106,1107,2103];
     
     for (var i=0;i<labslist.length;i++) {
