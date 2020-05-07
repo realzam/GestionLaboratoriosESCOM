@@ -12,10 +12,6 @@ router.get('/', (req, res) => {
   mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
     console.log('ruta raiz2');
     if(!err) {
-      var aux=rows;
-     
-      aux[0]["hola"] = "value3";
-      console.log(aux);
       res.json(rows);
 
     } else {
@@ -164,14 +160,7 @@ router.post('/reservaComputadora', (req, res) => {
   const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
   mysqlConnection.query(query, [usuario,compu,lab,inicio,dia,hora,fin,edo], (err, rows, fields) => {
     if(!err) {
-      
-      mysqlConnection.query('update Computadora set estado=? where idComputadora=? and idLaboratorio=?', ['Ocupada',compu,lab], (err2, rows2, fields2) => {
-        if(!err2) {}
-        else
-        {
           res.json({status: "reserva completada"});
-        }
-      });
     } else {
       console.log(err);
     }

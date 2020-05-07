@@ -4,8 +4,8 @@ CREATE TABLE Usuario (
   nombre VARCHAR(60) ,
   apellido VARCHAR(60) ,
   correo VARCHAR(60) NOT NULL,
-  tiposuario TinyInt NOT NULL,
-  password VARCHAR(45) NOT NULL,
+  tipoUsuario TinyInt NOT NULL,
+  password VARCHAR(60) NOT NULL,
   PRIMARY KEY(id)
 );
 

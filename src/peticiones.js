@@ -81,33 +81,82 @@ function setComputadorasEdo(edo,lab) {
   });
 }
 
-function modEdoLab(hora,lab,dia) {
-var edo;
-    mysqlConnection.query('select clase from Horario where idHorario= ? and hora= ? and dia= ?', [lab,hora,dia], (err, rows, fields) => {
+
+function modComputadoraEdo(edo,lab) {
+  var sql;
+  var parameros=[];
+  if(lab==0)
+  {
+    sql="update Computadora set estado = ?";
+    parameros.push(edo)
+  }else
+  {
+    sql="update Computadora set estado = ? where idLaboratorio = ?";
+    parameros.push(edo);
+    parameros.push(lab);
+  }
+  mysqlConnection.query(sql, parameros, (err, rows, fields) => {
+    if (!err) {
+      console.log('todas las Computadoras del laboratorio'+lab+' estan '+edo)
+    } else {
+      console.log('error',err)
+    }
+  });
+}
+function setComputadorasReservadas(dia,hora,) {
+  var sql="update Computadora as c,ReservaComputadora as r set c.estado='Reservada' where r.estado='En curso' and r.dia=? and r.hora=? and r.idLaboratorio=c.idLaboratorio and r.idComputadora=c.idComputadora"
+
+  return new Promise(function (resolve, reject) {
+    mysqlConnection.query(sql, [dia,hora], (err, rows, fields) => {
       if (!err) {
-      //  console.log('rows',rows);
-       // console.log('row clase',rows[0]['clase']);
-        if(rows[0]['clase']=="LIBRE")
-        {
-          edo="Tiempo libre",
-          setComputadorasEdo('Disponible',lab)
-        }else{
-          edo="En Clase",
-          setComputadorasEdo('Ocupada',lab)
-        }
-          
-          mysqlConnection.query('update Laboratorio set estado = ? where idLaboratorio= ?', [edo, lab], (err2, rows2, fields2) => {
-            if (!err2) { 
-              console.log('laboratorio'+lab+' en' +edo)
-            } else {
-              console.log('error',err2)
-            }
-          });
-      } else {
-     console.log('error',err)
+        console.log('reservar hechas')
+      }else{
+        console.log(err)
       }
     });
+    mysqlConnection.query(sql, [dia,hora], (err, rows, fields) => {
+      if (!err) {
+        console.log('reservar hechas')
+      }else{
+        console.log(err)
+      }
+    });
+
+  })
+ }
+function  getLibreLaboratorio(lab,hora,dia) {
+  return new Promise(function (resolve, reject) {
+
+    mysqlConnection.query('select clase from Horario where idHorario= ? and hora= ? and dia= ?', [lab,hora,dia], (err, rows, fields) => {
+      if (!err) {
+
+        if(rows[0]['clase']=="LIBRE")
+        {
+          resolve("Tiempo libre");
+          
+        }else{
+          setComputadorasEdo('Ocupada',lab)
+          resolve("En clase")
+        }
+      }else{
+        console.log(err)
+        resolve("Error")
+      }
+    });
+  });
 }
+
+function modEdoLab(lab,edo) {
+  mysqlConnection.query('update Laboratorio set estado = ? where idLaboratorio= ?',[edo,lab], (err, rows, fields) => {
+     if (!err) {
+      console.log("Laboratorio "+lab+" esta "+edo)
+    }else{
+      console.log(err)
+    }
+  });
+}
+
+
 
 
 module.exports.getLabs=getLabs;
@@ -115,3 +164,7 @@ module.exports.modCompu=modCompu;
 module.exports.modEdoLab=modEdoLab;
 module.exports.setLaboratoriosEdo=setLaboratoriosEdo;
 module.exports.setComputadorasEdo=setComputadorasEdo;
+
+module.exports.getLibreLaboratorio=getLibreLaboratorio;
+module.exports.setComputadorasReservadas=setComputadorasReservadas;
+module.exports.modComputadoraEdo=modComputadoraEdo;

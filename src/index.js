@@ -20,52 +20,50 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
 //app.use(express.json());
-var labslist=[1105,1106,1107,2103];
+
 // Routes
 app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
 const server=app.listen(app.get('port'), () => {
   console.log('now',moment().format('dddd MMMM YYYY H:mm:ss'));
- // scheduling()
+ scheduling()
   setInterval(interval2, 1000*60*3);
 });
 
 
-function scheduling()
+async function scheduling()
 {
   console.log('horario',moment().format('dddd MMMM YYYY H:mm:ss'));
   var hora;
   var dia=moment().day()
   if(dia==6||dia==0)
  {
-   hora=0;
+  
+  peticiones.setLaboratoriosEdo('No disponible',0);
+  peticiones.setComputadorasEdo('Ocupadas',0);
  }else{
   hora=utils.getHoraID(moment())
- }
-  if(hora==0)
-  {
-    peticiones.setLaboratoriosEdo('No disponible',0);
-    peticiones.setComputadorasEdo('Ocupadas',0);
-  }
-  
-  
-  else if(hora==3||hora==9)
+  if(hora==3||hora==9)
   {
     peticiones.setLaboratoriosEdo('Tiempo Libre',0);
     peticiones.setComputadorasEdo('Disponilbe',0);
-  }
- 
-  else{
+  }else{
+    var labslist=[1105,1106,1107,2103];
+    
     for (var i=0;i<labslist.length;i++) {
-  
-      console.log('bd????');
-      
-      peticiones.modEdoLab(hora,labslist[i],dia)
+      var edo=await peticiones.getLibreLaboratorio(labslist[i] ,hora,dia)
+        peticiones.modEdoLab(labslist[i],edo)
+        if(edo="Tiempo libre")
+        {
+          peticiones.setComputadorasEdo('Disponible',labslist[i]);
+        }
     }
   }
+
+  peticiones.setComputadorasReservadas(dia,hora)
+}
   console.log('nextTimer',utils.nextTimer(moment()).add(1,'second').format('dddd MMMM YYYY H:mm:ss'));
   timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(moment())-moment()+1000)
-
 
 }
 
@@ -138,9 +136,6 @@ io.on('connection',ws =>{
   });
 
 });
-
-
-
 
 io.on('close', function close() {
   console.log('websocket closed')
