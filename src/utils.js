@@ -50,7 +50,13 @@ return a.millisecond()>=b.millisecond()?a:b;*/
 
 function getHoraID(hoy)
 {
+  
   var aux=hoy.clone()
+  console.table({
+    getHoraID:'',
+    hoy:hoy.format('dddd D MMMM YYYY H:mm:ss'),
+    aux:aux.format('dddd D MMMM YYYY H:mm:ss')
+  })
   aux=setHora(aux,6,59,59);
   if(compareDate(hoy,aux)==aux)
       return 0;
