@@ -49,16 +49,7 @@ return a.millisecond()>=b.millisecond()?a:b;
 
 function getHoraID(hoy)//devuelve el id de una fecha
 {
-  var aux;
-  var rr;
-  for (let i = 1; i <=12; i++) {
-    aux=getDateFromID(i).subtract(1,'second');
-    rr=compareDate(hoy,aux)
-    if(rr==aux)
-      return i-1;   
-  }
-  return 0;
- /* 
+
   var aux=hoy.clone()
   aux=setHora(aux,6,59,59);
   if(compareDate(hoy,aux)==aux)
@@ -96,7 +87,7 @@ function getHoraID(hoy)//devuelve el id de una fecha
      aux=setHora(aux,21,29,59)
      if(compareDate(hoy,aux)==aux)
      return 11;
- return 0;*/
+ return 0;
 }
 
 function setHora(date,h,m,s)
@@ -141,8 +132,6 @@ function getDateFromID(id)
       return setHora(aux,18,30,00)
     case 11:
       return setHora(aux,20,00,00)
-    case 12:
-      return setHora(aux,21,30,00)
     default:
       return setHora(aux,00,00,00)
  }
