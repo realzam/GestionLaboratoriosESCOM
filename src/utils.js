@@ -20,8 +20,7 @@ function nextTimer(hoy)
 
 function compareDate(a,b)
 {
-  return a.valueOf()>=b.valueOf()?a:b;
-  /*
+
 if(a.year()!=b.year())
 {
   return a.year()>b.year()?a:b;
@@ -45,7 +44,7 @@ if(a.second()!=b.second())
 {
   return a.second()>b.second()?a:b;
 }
-return a.millisecond()>=b.millisecond()?a:b;*/
+return a.millisecond()>=b.millisecond()?a:b;
 }
 
 function getHoraID(hoy)//devuelve el id de una fecha
