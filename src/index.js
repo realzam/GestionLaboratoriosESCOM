@@ -53,13 +53,12 @@ const server=app.listen(app.get('port'), () => {
 });
 
 function fixMoment() {
-  var aux=moment(momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS'))
   console.table({
     moment:moment().format('dddd D MMMM YYYY H:mm:ss:SSS'),
-    momento:aux.format('dddd D MMMM YYYY H:mm:ss:SSS'),
+    momento:momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'),
 
     momentUnix:moment().valueOf(),
-    momentoUnix:aux.valueOf()
+    momentoUnix:momento.momento().valueOf(),
     })
 }
 
