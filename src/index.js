@@ -88,6 +88,8 @@ async function scheduling()
   peticiones.setComputadorasReservadas(dia,hora)
 }
   console.log('nextTimer',utils.nextTimer(momento.momento()).format('dddd MMMM YYYY H:mm:ss'));
+  console.log('nextTimer',utils.nextTimer(momento.momento()).valueOf());
+  console.log('momento  ',momento.momento().valueOf())
   console.log('mimisecond to nexttimer sheduling',utils.nextTimer(momento.momento())-momento.momento());
   
   timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
