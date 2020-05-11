@@ -20,6 +20,11 @@ function nextTimer(hoy)
 
 function compareDate(a,b)
 {
+  console.table({
+    compareDate:'',
+    a:a.format('dddd D MMMM YYYY H:mm:ss'),
+    b:b.format('dddd D MMMM YYYY H:mm:ss')
+  })
   return a.valueOf()>=b.valueOf()?a:b;
   /*
 if(a.year()!=b.year())
@@ -52,11 +57,6 @@ function getHoraID(hoy)
 {
   
   var aux=hoy.clone()
-  console.table({
-    getHoraID:'',
-    hoy:hoy.format('dddd D MMMM YYYY H:mm:ss'),
-    aux:aux.format('dddd D MMMM YYYY H:mm:ss')
-  })
   aux=setHora(aux,6,59,59);
   if(compareDate(hoy,aux)==aux)
       return 0;
