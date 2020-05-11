@@ -53,6 +53,12 @@ function getHoraID(hoy)//devuelve el id de una fecha
   var aux;
   for (let i = 1; i <=12; i++) {
     aux=getDateFromID(i).subtract(1,'second');
+    console.table({
+      i:i,
+      hoy:hoy.format('dddd D MMMM YYYY H:mm:ss'),
+      aux:aux.format('dddd D MMMM YYYY H:mm:ss'),
+      if:compareDate(hoy,aux)==aux
+    })
     if(compareDate(hoy,aux)==aux)
       return i-1;   
   }
@@ -110,7 +116,7 @@ function setHora(date,h,m,s)
   if(s<=9)
     ss='0'+ss;
     var res=moment(date.format('YYYY-MM-DD')+'T'+sh+':'+sm+':'+ss);
-    console.log('set hora',res)
+   // console.log('set hora',res)
   return res;
 }
 
