@@ -51,15 +51,18 @@ return a.millisecond()>=b.millisecond()?a:b;*/
 function getHoraID(hoy)//devuelve el id de una fecha
 {
   var aux;
+  var rr;
   for (let i = 1; i <=12; i++) {
     aux=getDateFromID(i).subtract(1,'second');
+    rr=compareDate(hoy,aux)
     console.table({
       i:i,
-      hoy:hoy.format('dddd D MMMM YYYY H:mm:ss'),
-      aux:aux.format('dddd D MMMM YYYY H:mm:ss'),
-      if:compareDate(hoy,aux)==aux
+      hoy:hoy.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
+      aux:aux.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
+      rr:rr.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
+      if:rr==aux
     })
-    if(compareDate(hoy,aux)==aux)
+    if(rr==aux)
       return i-1;   
   }
   return 0;
