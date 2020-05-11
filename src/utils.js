@@ -109,7 +109,9 @@ function setHora(date,h,m,s)
     sm='0'+sm;
   if(s<=9)
     ss='0'+ss;
-  return moment(date.format('YYYY-MM-DD')+'T'+sh+':'+sm+':'+ss)
+    var res=moment(date.format('YYYY-MM-DD')+'T'+sh+':'+sm+':'+ss);
+    console.log('set hora',res)
+  return res;
 }
 
 function getDateFromID(id)
