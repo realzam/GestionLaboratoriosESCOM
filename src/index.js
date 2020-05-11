@@ -23,10 +23,16 @@ var timeOutReserva;
 global.dis=[]
 global.labslist=[1105,1106,1107,2103];
 global.timersReserva=[];
-var inicio=momento.momento()
+var inicio=momento.momento();
 var idaux=utils.getHoraID(inicio);
 var dateaxu=utils.getDateFromID(idaux).add(10,'minutes');
 var major=utils.compareDate(inicio,dateaxu);
+console.table({
+  idaux:idaux,
+  inicio:inicio.format('dddd D MMMM YYYY H:mm:ss'),
+  dateaxu:dateaxu.format('dddd D MMMM YYYY H:mm:ss'),
+  major:major.format('dddd D MMMM YYYY H:mm:ss')
+})
 if(major== inicio)
 {
   idaux++;
