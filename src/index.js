@@ -52,12 +52,14 @@ const server=app.listen(app.get('port'), () => {
   setInterval(interval2, 1000*60*5);
 });
 
-function fixMoment(params) {
+function fixMoment() {
+  var aux=moment(momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS'))
   console.table({
     moment:moment().format('dddd D MMMM YYYY H:mm:ss:SSS'),
-    momento:momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'),
+    momento:aux.format('dddd D MMMM YYYY H:mm:ss:SSS'),
+
     momentUnix:moment().valueOf(),
-    momentoUnix:momento.momento().valueOf()
+    momentoUnix:aux.valueOf()
     })
 }
 
