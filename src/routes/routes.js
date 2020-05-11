@@ -2,23 +2,13 @@ const express = require('express');
 const router = express.Router();
 const mysqlConnection  = require('../database.js');
 const helpers=require('./helpers');
-const path = require('path');
-
+const utils=require('../utils.js');
+const momento= require('../momento.js');
 // GET all Employees
-
-router.get('/', (req, res) => {
-  console.log('ruta raiz');
-  
-  mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
-    console.log('ruta raiz2');
-    if(!err) {
-      res.json(rows);
-
-    } else {
-      console.log('ruta raiz3');
-      console.log(err);
-    }
-  });  
+const peticiones=require('../peticiones.js');
+router.get('/', async (req, res) => {
+  var labs = await peticiones.getLabsInfo()
+  res.json(labs);
 });
 
 
@@ -153,14 +143,29 @@ router.put('/modifyAlumno/:id', (req, res) => {
 
 
 router.post('/reservaComputadora', (req, res) => {
-  console.log('reserva');
   
-  const {usuario,compu,lab,inicio,dia,hora,fin,edo } = req.body;
-  //insert into ReservaComputadora() values(2015031381,1,2103,'2020-05-05 15:10:00',2,6,'2020-05-05 16:10:00',"usando")
+  
+  const {usuario,compu,lab,dia,hora} = req.body;
+  var edo="En espera"
   const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
-  mysqlConnection.query(query, [usuario,compu,lab,inicio,dia,hora,fin,edo], (err, rows, fields) => {
+  var inicio=momento.momento();
+  var formato='YYYY-DD-MM HH:mm:ss';
+  if(utils.compareDate(inicio,utils.getDateFromID(hora))==inicio)
+  {
+
+    var fin=inicio.clone().add(10,'second')
+   utils.setTimers(fin)
+  }else
+  {
+    var fin=utils.getDateFromID(hora).add(10,'minutes')
+  }
+  
+ 
+  mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo], (err, rows, fields) => {
     if(!err) {
-          res.json({status: "reserva completada"});
+      console.log('reserva hecha');
+          res.json({status: "reserva hecha"});
+          
     } else {
       console.log(err);
     }

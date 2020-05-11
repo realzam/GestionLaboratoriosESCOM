@@ -1,21 +1,40 @@
 const mysqlConnection  = require('./database.js');
 
-function getLabs(comm) {
-  var responseG={}
-  responseG['comando']='/labs';
-  return new Promise(resolve => {
-    mysqlConnection.query('select l.idLaboratorio as id_laboratorio,l.estado ,count(*) as disponibles from Laboratorio l,Computadora c where c.idLaboratorio=l.idLaboratorio and c.estado="Disponible" group by l.idLaboratorio', (err, rows, fields) => {
+function Labs() {
+  return new Promise( async function (resolve, reject) {
+    mysqlConnection.query('select idLaboratorio as id_laboratorio,estado from Laboratorio', (err, rows, fields) => {
       if(!err) {
-          var a=JSON.stringify(rows);
-          responseG['ok']=true;
-          responseG['info']=a;
+          resolve(rows)
       } else {
-        responseG['ok']=false;
-        responseG['info']=a;
+        throw err
       }
-      resolve(JSON.stringify(responseG))
     }); 
   });
+}
+
+async function getLabsInfo() {
+global.dis=[]
+  for (const item of global.labslist) {
+    var c=await getCompusDisponibles(item)
+   //console.log(item,c);
+    global.dis.push(c)
+  }
+  var labs=await Labs();
+  var i=0;
+   for (const item of labs) {
+     item['disponibles']=dis[i]
+     i++
+    }
+
+  return labs
+}
+
+
+async function getLabs() {
+  var responseG={}
+  responseG['comando']='/labs';
+  responseG['info']=await getLabsInfo();
+  resolve(JSON.stringify(responseG))
 }
 
 function modCompu(id,lab,edo) {
@@ -60,16 +79,16 @@ function setLaboratoriosEdo(edo) {
 }
 
 function setComputadorasEdo(edo,lab) {
+
   var sql;
   var parameros=[];
+  parameros.push(edo);
   if(lab==0)
   {
     sql="update Computadora set estado = ?";
-    parameros.push(edo)
   }else
   {
     sql="update Computadora set estado = ? where idLaboratorio = ?";
-    parameros.push(edo);
     parameros.push(lab);
   }
   mysqlConnection.query(sql, parameros, (err, rows, fields) => {
@@ -103,9 +122,9 @@ function modComputadoraEdo(edo,lab) {
     }
   });
 }
+
 function setComputadorasReservadas(dia,hora,) {
   var sql="update Computadora as c,ReservaComputadora as r set c.estado='Reservada' where r.estado='En curso' and r.dia=? and r.hora=? and r.idLaboratorio=c.idLaboratorio and r.idComputadora=c.idComputadora"
-
   return new Promise(function (resolve, reject) {
     mysqlConnection.query(sql, [dia,hora], (err, rows, fields) => {
       if (!err) {
@@ -114,16 +133,10 @@ function setComputadorasReservadas(dia,hora,) {
         console.log(err)
       }
     });
-    mysqlConnection.query(sql, [dia,hora], (err, rows, fields) => {
-      if (!err) {
-        console.log('reservar hechas')
-      }else{
-        console.log(err)
-      }
-    });
-
   })
  }
+
+
 function  getLibreLaboratorio(lab,hora,dia) {
   return new Promise(function (resolve, reject) {
 
@@ -132,11 +145,10 @@ function  getLibreLaboratorio(lab,hora,dia) {
 
         if(rows[0]['clase']=="LIBRE")
         {
-          resolve("Tiempo libre");
+          resolve('Tiempo libre');
           
         }else{
-          setComputadorasEdo('Ocupada',lab)
-          resolve("En clase")
+          resolve('En clase')
         }
       }else{
         console.log(err)
@@ -156,7 +168,31 @@ function modEdoLab(lab,edo) {
   });
 }
 
+function getCompusDisponibles(lab)
+{
+  return new Promise(resolve => {
+  mysqlConnection.query('select ifNULL(count(*),0) as count from Computadora where idLaboratorio=? and estado=?',[lab,"Disponible"], (err, rows, fields) => {
+    if (!err) {
+     resolve(rows[0]['count'])
+   }else{
+     console.log(err)
+   }
+ });
+});
+}
 
+function reservaTimeOut(date) {
+    var edo="No completada";
+    var edo2="En espera";
+    console.log('reservaTimeOut date',date)
+    mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?',[edo,date,edo2], (err, rows, fields) => {
+      if (!err) {
+       console.log(rows['changedRows']+ ' reservas no completadas')  
+     }else{
+       console.log(err)
+     }
+   });
+}
 
 
 module.exports.getLabs=getLabs;
@@ -168,3 +204,7 @@ module.exports.setComputadorasEdo=setComputadorasEdo;
 module.exports.getLibreLaboratorio=getLibreLaboratorio;
 module.exports.setComputadorasReservadas=setComputadorasReservadas;
 module.exports.modComputadoraEdo=modComputadoraEdo;
+
+module.exports.getCompusDisponibles=getCompusDisponibles;
+module.exports.getLabsInfo=getLabsInfo;
+module.exports.reservaTimeOut=reservaTimeOut;
