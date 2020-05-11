@@ -87,9 +87,9 @@ async function scheduling()
   }
   peticiones.setComputadorasReservadas(dia,hora)
 }
-  console.log('nextTimer',utils.nextTimer(momento.momento()).format('dddd MMMM YYYY H:mm:ss'));
-  console.log('nextTimer',utils.nextTimer(momento.momento()).valueOf());
-  console.log('momento  ',momento.momento().valueOf())
+  console.log('nextTimer',utils.nextTimer(momento.momento()).format('dddd DD MMMM YYYY H:mm:ss:SSS'));
+  console.log('nextTimer',utils.nextTimer(momento.momento()).valueOf(),utils.nextTimer(momento.momento()).format('dddd DD MMMM YYYY H:mm:ss:SSS')  );
+  console.log('momento  ',momento.momento().valueOf(),momento.momento().format('dddd DD MMMM YYYY H:mm:ss:SSS'))
   console.log('mimisecond to nexttimer sheduling',utils.nextTimer(momento.momento())-momento.momento());
   
   timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
