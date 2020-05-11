@@ -54,13 +54,6 @@ function getHoraID(hoy)//devuelve el id de una fecha
   for (let i = 1; i <=12; i++) {
     aux=getDateFromID(i).subtract(1,'second');
     rr=compareDate(hoy,aux)
-    console.table({
-      i:i,
-      hoy:hoy.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
-      aux:aux.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
-      rr:rr.format('dddd D MMMM YYYY H:mm:ss:SSSSS'),
-      if:rr==aux
-    })
     if(rr==aux)
       return i-1;   
   }

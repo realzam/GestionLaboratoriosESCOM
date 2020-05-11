@@ -27,13 +27,6 @@ var inicio=momento.momento();
 var idaux=utils.getHoraID(inicio);
 var dateaxu=utils.getDateFromID(idaux).add(10,'minutes');
 var major=utils.compareDate(inicio,dateaxu);
-console.table({
-  momentServer:moment().format('dddd D MMMM YYYY H:mm:ss'),
-  idaux:idaux,
-  inicio:inicio.format('dddd D MMMM YYYY H:mm:ss'),
-  dateaxu:dateaxu.format('dddd D MMMM YYYY H:mm:ss'),
-  major:major.format('dddd D MMMM YYYY H:mm:ss')
-})
 if(major== inicio)
 {
   idaux++;
