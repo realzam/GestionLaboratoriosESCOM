@@ -46,22 +46,10 @@ app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
 const server=app.listen(app.get('port'), () => {
   console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss'));
-  //scheduling();
-  //timerReserva(0);
-  fixMoment()
+  scheduling();
+  timerReserva(0);
   setInterval(interval2, 1000*60*5);
 });
-
-function fixMoment() {
-  console.table({
-    moment:moment().format('dddd D MMMM YYYY H:mm:ss:SSS'),
-    momento:momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'),
-
-    momentUnix:moment().valueOf(),
-    momentoUnix:momento.momento().valueOf(),
-    })
-}
-
 
 async function scheduling()
 {
