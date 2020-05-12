@@ -181,10 +181,12 @@ function getCompusDisponibles(lab)
 });
 }
 
-function reservaTimeOut(date) {
+async function reservaTimeOut(date) {
+
     var edo="No completada";
     var edo2="En espera";
     console.log('reservaTimeOut date',date)
+    await getreservaTimeOutNotification(date);
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?',[edo,date,edo2], (err, rows, fields) => {
       if (!err) {
        console.log(rows['changedRows']+ ' reservas no completadas')  
@@ -193,7 +195,22 @@ function reservaTimeOut(date) {
      }
    });
 }
+function getreservaTimeOutNotification(date) {
+  var edo="En espera";
+  return new Promise(resolve => {
+    mysqlConnection.query('select r.idUsuario,t.idToken from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado=? and r.idUsuario=t.usuario',[date,edo], (err, rows, fields) => {
+      if (!err) {
+      console.log('reservaTimeOutSendNotification')
+      console.log(rows)
 
+      resolve(true)
+    }else{
+      console.log(err)
+      resolve(false)
+    }
+  });
+ });
+}
 
 module.exports.getLabs=getLabs;
 module.exports.modCompu=modCompu;

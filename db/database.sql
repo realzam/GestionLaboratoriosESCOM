@@ -9,6 +9,13 @@ CREATE TABLE Usuario (
   PRIMARY KEY(id)
 );
 
+CREATE TABLE TokenNotification (
+  idToken VARCHAR(160) NOT NULL,
+  usuario INT NOT NULL,
+  foreign key(usuario) references Usuario(id)
+  on delete cascade on update cascade,
+  PRIMARY KEY(idToken,usuario)
+);
 CREATE TABLE Laboratorio (
   idLaboratorio INT NOT NULL,
   estado VARCHAR(45) NOT NULL,

@@ -7,7 +7,6 @@ const momento= require('./momento.js');
 const utils=require('./utils.js');
 const peticiones=require('./peticiones.js');
 const app = express();
-const moment = require('moment');
 // Settings
 //momento.setFecha(moment('2020-05-11T18:09:50'))
 
@@ -83,13 +82,8 @@ async function scheduling()
         }
     }
   }
-  peticiones.setComputadorasReservadas(dia,hora)
+  //peticiones.setComputadorasReservadas(dia,hora)
 }
-  console.log('nextTimer',utils.nextTimer(momento.momento()).format('dddd DD MMMM YYYY H:mm:ss:SSS'));
-  console.log('nextTimer',utils.nextTimer(momento.momento()).valueOf(),utils.nextTimer(momento.momento()).format('dddd DD MMMM YYYY H:mm:ss:SSS')  );
-  console.log('momento  ',momento.momento().valueOf(),momento.momento().format('dddd DD MMMM YYYY H:mm:ss:SSS'))
-  console.log('mimisecond to nexttimer sheduling',utils.nextTimer(momento.momento())-momento.momento());
-  
   timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
 
 }
@@ -101,9 +95,6 @@ function timerReserva(opc) {
     peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
   }
-  console.log('timers reserva list',global.timersReserva)
-  console.log('timer reserva',global.timersReserva[0].format('dddd MMMM YYYY H:mm:ss'));
-
   timeOutReserva=setTimeout(()=>{timerReserva(2) },global.timersReserva[0]-momento.momento());
 
 }
