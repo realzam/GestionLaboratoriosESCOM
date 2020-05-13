@@ -31,10 +31,12 @@ global.dis=[]
 
 
 async function getLabs() {
+  return new Promise( async function (resolve, reject) {
   var responseG={}
   responseG['comando']='/labs';
   responseG['info']=await getLabsInfo();
-  resolve(JSON.stringify(responseG))
+  resolve(JSON.stringify(responseG))}
+  );
 }
 
 function modCompu(id,lab,edo) {
