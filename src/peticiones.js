@@ -235,12 +235,12 @@ function enviarNotificacion(usuarios)
     json: {
       "registration_ids":destinos,
       "notification":{
-        "title":"Postman",
-        "body":"Body desde Postman"
+        "title":"Control ESCOM",
+        "body":"Se agoto el tiempo de tu reserva"
       },
       "priority": "high",
       "data":{
-        "comida":"Comida6 desda postman",
+        "info":"Se agoto el tiempo de tu reserva",
         "click_action": "FLUTTER_NOTIFICATION_CLICK"
       }
     }
