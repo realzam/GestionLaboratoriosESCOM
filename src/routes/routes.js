@@ -127,7 +127,7 @@ router.post('/login', async (req, res) => {
     }
   });  
 });
-
+/*
 router.put('/modifyAlumno/:id', (req, res) => {
   const { name, salary } = req.body;
   const { id } = req.params;
@@ -135,6 +135,19 @@ router.put('/modifyAlumno/:id', (req, res) => {
   mysqlConnection.query(query, [id, name, salary], (err, rows, fields) => {
     if(!err) {
       res.json({status: "Usuario guardado"});
+    } else {
+      console.log(err);
+    }
+  });
+});*/
+
+router.put('/modifyToken/:id', (req, res) => {
+  const { token} = req.body;
+  const { id } = req.params;
+  const query ="update  TokenNotification set idToken=? where usuario=?"
+  mysqlConnection.query(query, [token,id], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: "Token actualizado"});
     } else {
       console.log(err);
     }
@@ -153,11 +166,11 @@ router.post('/reservaComputadora', (req, res) => {
   if(utils.compareDate(inicio,utils.getDateFromID(hora))==inicio)
   {
 
-    var fin=inicio.clone().add(10,'second')
-   utils.setTimers(fin)
+    var fin=inicio.clone().add(global.reservaTime,global.reservaTimeType)
+   utils.addTimerReserva(fin)
   }else
   {
-    var fin=utils.getDateFromID(hora).add(10,'minutes')
+    var fin=utils.getDateFromID(hora).add(global.reservaTime,global.reservaTimeType)
   }
   
  

@@ -1,50 +1,43 @@
 const express = require('express');
-const request = require('request');
 const path = require('path');
 const WebSocket= require('ws');
 const bodyParser = require('body-parser');
 const momento= require('./momento.js');
 const utils=require('./utils.js');
 const peticiones=require('./peticiones.js');
+var request = require('request');
+const moment= require('moment');
 const app = express();
-// Settings
-//momento.setFecha(moment('2020-05-11T18:09:50'))
 
+// Settings
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 // Middlewares
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+app.use(require('./routes/routes'));
+app.use(require('./routes/views'));
 
+//global varibles
 var timeOutReserva;
+var timeOutSheduling;
 global.dis=[]
 global.labslist=[1105,1106,1107,2103];
 global.timersReserva=[];
-var inicio=momento.momento();
-var idaux=utils.getHoraID(inicio);
-var dateaxu=utils.getDateFromID(idaux).add(10,'minutes');
-var major=utils.compareDate(inicio,dateaxu);
-if(major== inicio)
-{
-  idaux++;
-}
-for (let i= idaux; i <=11; i++) {
-  var d=utils.getDateFromID(i).add(10,'minutes');
-  global.timersReserva.push(d);
-}
+global.reservaTime=10;
+global.reservaTimeType='second'
 
 
 
-app.use(bodyParser.json())
 
-//app.use(express.json(
-// Routes
-app.use(require('./routes/routes'));
-app.use(require('./routes/views'));
+//momento.setFecha(moment('2020-05-21T00:11:00'))
+utils.setTimersReservas()
+
 const server=app.listen(app.get('port'), () => {
-  console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss'));
+  console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
   scheduling();
   timerReserva(0);
   setInterval(interval2, 1000*60*5);
@@ -84,7 +77,7 @@ async function scheduling()
   }
   //peticiones.setComputadorasReservadas(dia,hora)
 }
-  timpofaltante=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
+timeOutSheduling=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
 
 }
 function timerReserva(opc) {
@@ -94,7 +87,10 @@ function timerReserva(opc) {
     var formato='YYYY-DD-MM HH:mm:ss';
     peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
+    if(global.timersReserva.length==0)
+      utils.setTimersReservas()
   }
+  
   timeOutReserva=setTimeout(()=>{timerReserva(2) },global.timersReserva[0]-momento.momento());
 
 }
@@ -108,11 +104,11 @@ function heartbeat() {
 let interval2 = ()=>{
   console.log('hola mundo, no sleep',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
-    if (!error && res.statusCode == 200) {
-    }
-});
-
+    if (!error && res.statusCode == 200) {}
+  })
 }
+
+
 
 const interval = setInterval(function ping() {
   io.clients.forEach(function each(ws) {

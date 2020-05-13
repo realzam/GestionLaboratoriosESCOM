@@ -1,5 +1,5 @@
 const mysqlConnection  = require('./database.js');
-
+var request = require('request');
 function Labs() {
   return new Promise( async function (resolve, reject) {
     mysqlConnection.query('select idLaboratorio as id_laboratorio,estado from Laboratorio', (err, rows, fields) => {
@@ -183,9 +183,10 @@ function getCompusDisponibles(lab)
 
 async function reservaTimeOut(date) {
 
-    var edo="No completada";
+    var edo="No confirmada";
     var edo2="En espera";
     console.log('reservaTimeOut date',date)
+
     await getreservaTimeOutNotification(date);
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?',[edo,date,edo2], (err, rows, fields) => {
       if (!err) {
@@ -200,9 +201,9 @@ function getreservaTimeOutNotification(date) {
   return new Promise(resolve => {
     mysqlConnection.query('select r.idUsuario,t.idToken from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado=? and r.idUsuario=t.usuario',[date,edo], (err, rows, fields) => {
       if (!err) {
-      console.log('reservaTimeOutSendNotification')
-      console.log(rows)
-
+      console.log('reservaTimeOutSendNotification',rows.length)
+      if(rows.length>0)
+        enviarNotificacion(rows)
       resolve(true)
     }else{
       console.log(err)
@@ -210,6 +211,43 @@ function getreservaTimeOutNotification(date) {
     }
   });
  });
+}
+function enviarNotificacion(usuarios)
+{
+  var destinos=[];
+console.log('len',usuarios.length)
+  
+  for (let i = 0; i < usuarios.length; i++) {
+    const element = usuarios[i]['idToken'];
+    destinos.push(element)
+  }
+  
+ 
+  console.log('detinos',destinos)
+  var options = {
+    uri: 'https://fcm.googleapis.com/fcm/send',
+    headers: {'content-type' : 'application/json','Authorization':'key=AAAAdEXNXUo:APA91bG5xbYp7xLESUmR-r9hwC0-aJR6QWQgd6b9cDrKhmIEbPXKtWk_LfqFEehaD_0LLW93cmmHclT46PNVqu4AkS3qB3gaclK4k_HEtx4pRH_40lsumch6XRcyPLvA-jpiIVCV1ZG9'},
+    method: 'POST',
+    json: {
+      key:destinos,
+      "notification":{
+        "title":"Postman",
+        "body":"Body desde Postman"
+      },
+      "priority": "high",
+      "data":{
+        "comida":"Comida6 desda postman",
+        "click_action": "FLUTTER_NOTIFICATION_CLICK"
+      }
+    }
+  };
+  
+  request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body) // Print the shortened url.
+    }
+  });
+
 }
 
 module.exports.getLabs=getLabs;

@@ -1,21 +1,26 @@
-const moment = require('moment');
 const index = require('./index.js');
 const momento= require('./momento.js');
-function nextTimer(hoy)
+
+function nextTimer(date,opc)
 {
-  var aux=hoy.clone()
- if(hoy.day()==6||hoy.day()==0)
- {
-  var next=aux.add(( (hoy.day()/6) +1),'day');
-  var after=setHora(next,7,0,0);
-  return after;
- }
- else{
-  var id=getHoraID(hoy)
-  if(id==0)
-    return setHora(aux.add(1,'day'),7,00,0)
-  return getDateFromID(id+1)
- }
+  var now=date.clone();
+  var addtime=0
+  if(opc!=null)
+  {
+   addtime=global.reservaTime
+  }
+
+  var compare=compareDate(now,getDateFromID(11).add(addtime,global.reservaTimeType))
+  if( (now.day()==5 && compare==now) || now.day()==6 || now.day()==0 )
+  {
+    now=setHora(now.day(1).add(7,'day'),7,0,0).add(addtime,global.reservaTimeType)
+   // console.log('nexTimerReserva',now.format('dddd D MMMM YYYY H:mm:ss'))
+    return now;
+  }
+  var id=getHoraID(now);
+  var res=(id==-1||id==11)?setHora(now.add(1,'day'),7,0,0).add(addtime,global.reservaTimeType):getDateFromID(id+1).add(addtime,global.reservaTimeType);
+  //console.log('nexTimer',res.format('dddd D MMMM YYYY H:mm:ss'));
+  return res;   
 }
 
 function compareDate(a,b)
@@ -51,58 +56,50 @@ function getHoraID(hoy)//devuelve el id de una fecha
 {
 
   var aux=hoy.clone()
-  aux=setHora(aux,6,59,59);
+  aux=setHora(aux,6,59,59,999);
   if(compareDate(hoy,aux)==aux)
       return 0;
-   aux=setHora(aux,8,29,59)
+   aux=setHora(aux,8,29,59,999)
    if(compareDate(hoy,aux)==aux)
       return 1;
-   aux=setHora(aux,9,59,59)
+   aux=setHora(aux,9,59,59,999)
    if(compareDate(hoy,aux)==aux)
       return 2;
-   aux=setHora(aux,10,29,59)
+   aux=setHora(aux,10,29,59,999)
    if(compareDate(hoy,aux)==aux)
      return 3;
-   aux=setHora(aux,11,59,59)
+   aux=setHora(aux,11,59,59,999)
    if(compareDate(hoy,aux)==aux)
        return 4;
-   aux=setHora(aux,13,29,59)
+   aux=setHora(aux,13,29,59,999)
    if(compareDate(hoy,aux)==aux)
      return 5;
-   aux=setHora(aux,14,59,59)
+   aux=setHora(aux,14,59,59,999)
    if(compareDate(hoy,aux)==aux)
       return 6;
-   aux=setHora(aux,16,29,59)
+   aux=setHora(aux,16,29,59,999)
    if(compareDate(hoy,aux)==aux)
      return 7;
-   aux=setHora(aux,17,59,59)
+   aux=setHora(aux,17,59,59,999)
    if(compareDate(hoy,aux)==aux)
      return 8;
-   aux=setHora(aux,18,29,59)
+   aux=setHora(aux,18,29,59,999)
    if(compareDate(hoy,aux)==aux)
      return 9;
-   aux=setHora(aux,19,59,59)
+   aux=setHora(aux,19,59,59,999)
    if(compareDate(hoy,aux)==aux)
      return 10;
-     aux=setHora(aux,21,29,59)
+     aux=setHora(aux,21,29,59,999)
      if(compareDate(hoy,aux)==aux)
      return 11;
- return 0;
+ return -1;
 }
 
-function setHora(date,h,m,s)
+function setHora(date,h,m,s,mm)
 {
-  var sh=h.toString()
-  var sm=m.toString()
-  var ss=s.toString();
-  if(h<=9)
-    sh='0'+sh;
-  if(m<=9)
-    sm='0'+sm;
-  if(s<=9)
-    ss='0'+ss;
-    var res=moment(date.format('YYYY-MM-DD')+'T'+sh+':'+sm+':'+ss);
-   // console.log('set hora',res)
+    if(mm==null)
+      mm=0;
+  var res=date.clone().hour(h).minute(m).second(s).millisecond(mm);
   return res;
 }
 
@@ -137,18 +134,40 @@ function getDateFromID(id)
  }
 }
 
-function setTimers(time)
+function addTimerReserva(time)
 { 
   
   console.log('reserva time ',time.format('dddd MMMM YYYY H:mm:ss'));
   global.timersReserva.push(time.clone());
   global.timersReserva.sort();
+  console.log('addTimerResercas',global.timersReserva,global.timersReserva.length)
   index.timerReserva(1)
 }
 
+function setTimersReservas() {
+
+  var inicio=nextTimer(momento.momento(),1);
+  global.timersReserva.push(inicio);
+  var id =getHoraID(inicio);
+  for (let i=id,x=0; i<=11; i++,x++) {
+    
+    var aux=nextTimer(global.timersReserva[x],1);
+    global.timersReserva.push(aux);
+ 
+  }
+}
+function printTimersReservas()
+{
+  for (let i = 0; i < global.timersReserva.length; i++) {
+    const element = global.timersReserva[i];
+    console.log(element.format('dddd MMMM YYYY H:mm:ss'))
+    
+  }
+}
 module.exports.nextTimer=nextTimer;
 module.exports.compareDate=compareDate;
 module.exports.getHoraID=getHoraID;
 module.exports.setHora=setHora;
 module.exports.getDateFromID=getDateFromID;
-module.exports.setTimers=setTimers;
+module.exports.addTimerReserva=addTimerReserva;
+module.exports.setTimersReservas=setTimersReservas;
