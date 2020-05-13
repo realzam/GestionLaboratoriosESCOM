@@ -215,21 +215,25 @@ function getreservaTimeOutNotification(date) {
 function enviarNotificacion(usuarios)
 {
   var destinos=[];
-console.log('len',usuarios.length)
-  
-  for (let i = 0; i < usuarios.length; i++) {
-    const element = usuarios[i]['idToken'];
-    destinos.push(element)
+  if(usuarios.length==1)
+  {
+    const element = usuarios[0]['idToken'];
+    destinos.push(element);
   }
-  
- 
-  console.log('detinos',destinos)
+  else
+  {
+    for (let i = 0; i < usuarios.length; i++) {
+      const element = usuarios[i]['idToken'];
+      destinos.push(element);
+    }
+  }
+  console.log('detinos',destinos);
   var options = {
     uri: 'https://fcm.googleapis.com/fcm/send',
     headers: {'content-type' : 'application/json','Authorization':'key=AAAAdEXNXUo:APA91bG5xbYp7xLESUmR-r9hwC0-aJR6QWQgd6b9cDrKhmIEbPXKtWk_LfqFEehaD_0LLW93cmmHclT46PNVqu4AkS3qB3gaclK4k_HEtx4pRH_40lsumch6XRcyPLvA-jpiIVCV1ZG9'},
     method: 'POST',
     json: {
-      key:destinos,
+      "registration_ids":destinos,
       "notification":{
         "title":"Postman",
         "body":"Body desde Postman"
