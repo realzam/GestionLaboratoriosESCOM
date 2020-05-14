@@ -215,7 +215,7 @@ function getreservaTimeOutNotification(date) {
       {
         for (let i = 0; i < rows.length; i++) {
           const element = rows[i];
-          await peticiones.modCompu(element['idComputadora'],element['idLaboratorio'],'Disponible')
+          await modCompu(element['idComputadora'],element['idLaboratorio'],'Disponible')
         }
         
         enviarNotificacion(rows)
