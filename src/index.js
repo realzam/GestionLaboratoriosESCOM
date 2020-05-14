@@ -7,6 +7,7 @@ const utils=require('./utils.js');
 const peticiones=require('./peticiones.js');
 var request = require('request');
 const moment= require('moment');
+const updateSocket=require('./sendUpdateSockets.js');
 const app = express();
 
 // Settings
@@ -33,7 +34,7 @@ global.reservaTimeType='second'
 
 
 
-momento.setFecha(moment('2020-05-12T07:01:00'))
+momento.setFecha(moment('2020-05-14T09:30:00'))
 utils.setTimersReservas()
 
 const server=app.listen(app.get('port'), () => {
@@ -87,8 +88,10 @@ function timerReserva(opc) {
     var formato='YYYY-DD-MM HH:mm:ss';
     peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
+    updateSocket.sendUpdateLabs();
     if(global.timersReserva.length==0)
       utils.setTimersReservas()
+
   }
   
   timeOutReserva=setTimeout(()=>{timerReserva(2) },global.timersReserva[0]-momento.momento());
@@ -178,5 +181,6 @@ function sendAll (message,yo) {
 
 
 module.exports.timerReserva=timerReserva;
+module.exports.sendAll=sendAll;
 
 

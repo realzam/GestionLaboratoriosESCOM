@@ -1,5 +1,8 @@
-const mysqlConnection  = require('./database.js');
 var request = require('request');
+
+const mysqlConnection  = require('./database.js');
+
+
 function Labs() {
   return new Promise( async function (resolve, reject) {
     mysqlConnection.query('select idLaboratorio as id_laboratorio,estado from Laboratorio', (err, rows, fields) => {
@@ -199,6 +202,7 @@ async function reservaTimeOut(date) {
      }
    });
 }
+
 function getreservaTimeOutNotification(date) {
   var edo="En espera";
   return new Promise(resolve => {
@@ -215,6 +219,7 @@ function getreservaTimeOutNotification(date) {
   });
  });
 }
+
 function enviarNotificacion(usuarios)
 {
   var destinos=[];
@@ -257,6 +262,8 @@ function enviarNotificacion(usuarios)
 
 }
 
+
+
 module.exports.getLabs=getLabs;
 module.exports.modCompu=modCompu;
 module.exports.modEdoLab=modEdoLab;
@@ -270,3 +277,4 @@ module.exports.modComputadoraEdo=modComputadoraEdo;
 module.exports.getCompusDisponibles=getCompusDisponibles;
 module.exports.getLabsInfo=getLabsInfo;
 module.exports.reservaTimeOut=reservaTimeOut;
+module.exports.sendUpdateLabs=sendUpdateLabs;

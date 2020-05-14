@@ -4,7 +4,9 @@ const mysqlConnection  = require('../database.js');
 const helpers=require('./helpers');
 const utils=require('../utils.js');
 const momento= require('../momento.js');
-// GET all Employees
+const updateSocket=require('../sendUpdateSockets.js');
+
+// GET
 const peticiones=require('../peticiones.js');
 router.get('/', async (req, res) => {
   var labs = await peticiones.getLabsInfo()
@@ -177,7 +179,8 @@ router.post('/reservaComputadora', (req, res) => {
   mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo], (err, rows, fields) => {
     if(!err) {
       console.log('reserva hecha');
-          res.json({status: "reserva hecha"});
+      updateSocket.sendUpdateLabs();
+      res.json({status: "reserva hecha"});
           
     } else {
       console.log(err);
