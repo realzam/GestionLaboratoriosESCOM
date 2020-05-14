@@ -188,7 +188,7 @@ function getCompusDisponibles(lab)
 }
 
 async function reservaTimeOut(date) {
-  return new Promise(resolve => {
+  return new Promise( async function (resolve, reject) {
     var edo="No confirmada";
     var edo2="En espera";
     console.log('reservaTimeOut date',date)
