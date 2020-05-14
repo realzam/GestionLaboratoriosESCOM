@@ -164,7 +164,7 @@ router.post('/reservaComputadora', (req, res) => {
   var edo="En espera"
   const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
   var inicio=momento.momento();
-  var formato='YYYY-DD-MM HH:mm:ss';
+  var formato='YYYY-MM-DD HH:mm:ss';
   if(utils.compareDate(inicio,utils.getDateFromID(hora))==inicio)
   {
 
