@@ -39,8 +39,8 @@ async function getLabs() {
   responseG['comando']='/labs';
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
-  resolve(JSON.stringify(responseG))}
-  );
+  resolve(JSON.stringify(responseG))
+});
 }
 
 function modCompu(id,lab,edo) {
@@ -274,10 +274,16 @@ function enviarNotificacion(usuarios)
 
 function getComputadoras(lab)
 {
+  var responseG={}
+  responseG['comando']='/computadoras';
+  responseG['ok']=true;
+  responseG['info']=await getLabsInfo();
+ 
   return new Promise(resolve => {
     mysqlConnection.query('select * from Computadora where idLaboratorio=?',[lab], (err, rows, fields) => {
       if (!err) {
-       resolve(rows)
+        responseG['info']=rows
+        resolve(JSON.stringify(responseG))
      }else{
        console.log(err)
      }
