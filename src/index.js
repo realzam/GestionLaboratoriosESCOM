@@ -141,7 +141,7 @@ io.on('connection',ws =>{
           break;
         case 'computadoras':
           res=await peticiones.getComputadoras(s[2])
-
+          console.log('computadoras',res)
           break;
         default:
           res="comando"
