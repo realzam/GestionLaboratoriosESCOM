@@ -277,4 +277,3 @@ module.exports.modComputadoraEdo=modComputadoraEdo;
 module.exports.getCompusDisponibles=getCompusDisponibles;
 module.exports.getLabsInfo=getLabsInfo;
 module.exports.reservaTimeOut=reservaTimeOut;
-module.exports.sendUpdateLabs=sendUpdateLabs;
