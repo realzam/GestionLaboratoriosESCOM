@@ -276,12 +276,13 @@ function getComputadoras(lab)
 {
   var responseG={}
   responseG['comando']='/computadoras';
-  responseG['ok']=true;
-  responseG['info']=await getLabsInfo();
+  
+
  
   return new Promise(resolve => {
     mysqlConnection.query('select * from Computadora where idLaboratorio=?',[lab], (err, rows, fields) => {
       if (!err) {
+        responseG['ok']=true;
         responseG['info']=rows
         resolve(JSON.stringify(responseG))
      }else{
