@@ -79,12 +79,12 @@ async function scheduling()
 timeOutSheduling=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
 
 }
-function timerReserva(opc) {
+async function timerReserva(opc) {
   clearTimeout(timeOutReserva)
   if(opc==2)
   {
     var formato='YYYY-MM-DD HH:mm:ss';
-    peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
+    await peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
     updateSocket.sendUpdateLabs();
     if(global.timersReserva.length==0)

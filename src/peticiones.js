@@ -188,7 +188,7 @@ function getCompusDisponibles(lab)
 }
 
 async function reservaTimeOut(date) {
-
+  return new Promise(resolve => {
     var edo="No confirmada";
     var edo2="En espera";
     console.log('reservaTimeOut date',date)
@@ -197,20 +197,30 @@ async function reservaTimeOut(date) {
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?',[edo,date,edo2], (err, rows, fields) => {
       if (!err) {
        console.log(rows['changedRows']+ ' reservas no completadas')  
+       resolve(true)
      }else{
        console.log(err)
      }
    });
+  });
 }
 
 function getreservaTimeOutNotification(date) {
   var edo="En espera";
   return new Promise(resolve => {
-    mysqlConnection.query('select r.idUsuario,t.idToken from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado=? and r.idUsuario=t.usuario',[date,edo], (err, rows, fields) => {
+    mysqlConnection.query('select r.idComputadora,r.idLaboratorio,t.idToken from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado=? and r.idUsuario=t.usuario',[date,edo], (err, rows, fields) => {
       if (!err) {
       console.log('reservaTimeOutSendNotification',rows.length)
       if(rows.length>0)
+      {
+        for (let i = 0; i < rows.length; i++) {
+          const element = rows[i];
+          await peticiones.modCompu(element['idComputadora'],element['idLaboratorio'],'Disponible')
+        }
+        
         enviarNotificacion(rows)
+      }
+        
       resolve(true)
     }else{
       console.log(err)
