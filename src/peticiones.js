@@ -272,6 +272,18 @@ function enviarNotificacion(usuarios)
 
 }
 
+function getComputadoras(lab)
+{
+  return new Promise(resolve => {
+    mysqlConnection.query('select * from Computadora where idLaboratorio=?',[lab], (err, rows, fields) => {
+      if (!err) {
+       resolve(rows)
+     }else{
+       console.log(err)
+     }
+   });
+  });
+}
 
 
 module.exports.getLabs=getLabs;
@@ -287,3 +299,4 @@ module.exports.modComputadoraEdo=modComputadoraEdo;
 module.exports.getCompusDisponibles=getCompusDisponibles;
 module.exports.getLabsInfo=getLabsInfo;
 module.exports.reservaTimeOut=reservaTimeOut;
+module.exports.getComputadoras=getComputadoras;

@@ -139,17 +139,9 @@ io.on('connection',ws =>{
         case 'labs':
           res=await peticiones.getLabs('');
           break;
-        case 'modCompu':
-          var resm=await peticiones.modCompu(s[2],s[3],s[4]);
-          if(resm['ok'])
-          {
-            console.log('mod compu ok mysql')
-            res=await peticiones.getLabs('/modcompu');
-          }else
-          {
-            res=JSON.stringify(resm);
-          }
-          
+        case 'computadoras':
+          res=await peticiones.getComputadoras(s[2])
+
           break;
         default:
           res="comando"

@@ -14,6 +14,8 @@ router.get('/', async (req, res) => {
 });
 
 
+
+
 router.put('/modifyComputadora/:id', (req, res) => {
 
   const { id } = req.params;
