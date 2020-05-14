@@ -140,7 +140,7 @@ function addTimerReserva(time)
   console.log('reserva time ',time.format('dddd MMMM YYYY H:mm:ss'));
   global.timersReserva.push(time.clone());
   global.timersReserva.sort();
-  console.log('addTimerResercas',global.timersReserva,global.timersReserva.length)
+  printTimersReservas()
   index.timerReserva(1)
 }
 
@@ -149,18 +149,19 @@ function setTimersReservas() {
   var inicio=nextTimer(momento.momento(),1);
   global.timersReserva.push(inicio);
   var id =getHoraID(inicio);
-  for (let i=id,x=0; i<=11; i++,x++) {
+  for (let i=id,x=0; i<11; i++,x++) {
     
     var aux=nextTimer(global.timersReserva[x],1);
     global.timersReserva.push(aux);
  
   }
+  printTimersReservas();
 }
 function printTimersReservas()
 {
   for (let i = 0; i < global.timersReserva.length; i++) {
     const element = global.timersReserva[i];
-    console.log(element.format('dddd MMMM YYYY H:mm:ss'))
+    console.log(element.format('dddd DD MMMM YYYY H:mm:ss'))
     
   }
 }

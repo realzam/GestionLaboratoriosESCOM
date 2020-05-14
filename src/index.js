@@ -83,7 +83,7 @@ function timerReserva(opc) {
   clearTimeout(timeOutReserva)
   if(opc==2)
   {
-    var formato='YYYY-DD-MM HH:mm:ss';
+    var formato='YYYY-MM-DD HH:mm:ss';
     peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
     updateSocket.sendUpdateLabs();

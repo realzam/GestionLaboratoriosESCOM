@@ -5,9 +5,9 @@ const helpers=require('./helpers');
 const utils=require('../utils.js');
 const momento= require('../momento.js');
 const updateSocket=require('../sendUpdateSockets.js');
-
-// GET
 const peticiones=require('../peticiones.js');
+// GET
+
 router.get('/', async (req, res) => {
   var labs = await peticiones.getLabsInfo()
   res.json(labs);
@@ -170,15 +170,17 @@ router.post('/reservaComputadora', (req, res) => {
 
     var fin=inicio.clone().add(global.reservaTime,global.reservaTimeType)
    utils.addTimerReserva(fin)
+   
   }else
   {
     var fin=utils.getDateFromID(hora).add(global.reservaTime,global.reservaTimeType)
   }
   
  
-  mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo], (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo],async (err, rows, fields) => {
     if(!err) {
       console.log('reserva hecha');
+      await peticiones.modCompu(compu,lab,'Reservada')
       updateSocket.sendUpdateLabs();
       res.json({status: "reserva hecha"});
           
