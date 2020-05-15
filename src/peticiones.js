@@ -44,7 +44,7 @@ async function getLabs() {
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
   responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
-  responseG['hora_id']=utils.getHoraID(momento.momento())
+  responseG['hora_id']=utils.getHoraID(momento.momento(l))
   resolve(JSON.stringify(responseG))
 });
 }
