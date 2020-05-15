@@ -29,12 +29,10 @@ global.dis=[]
 global.labslist=[1105,1106,1107,2103];
 global.timersReserva=[];
 global.reservaTime=10;
-global.reservaTimeType='second'
+global.reservaTimeType='second';
 
-
-momento.setFecha(moment('2020-05-14T10:30:01'))
-utils.setTimersReservas()
-
+//momento.setFecha(moment('2020-05-14T10:30:01'));
+utils.setTimersReservas();
 const server=app.listen(app.get('port'), () => {
   console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
   scheduling();
@@ -46,13 +44,13 @@ async function scheduling()
 {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   var hora;
-  var dia=momento.momento().day()
+  var dia=momento.momento().day();
   if(dia==6||dia==0)
  {
   peticiones.setLaboratoriosEdo('No disponible',0);
   peticiones.setComputadorasEdo('Ocupada',0);
  }else{
-  hora=utils.getHoraID(momento.momento())
+  hora=utils.getHoraID(momento.momento());
   if(hora==3||hora==9)
   {
     peticiones.setLaboratoriosEdo('Tiempo Libre',0);

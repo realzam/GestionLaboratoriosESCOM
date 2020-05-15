@@ -1,5 +1,5 @@
 var request = require('request');
-
+const momento= require('./momento.js');
 const mysqlConnection  = require('./database.js');
 
 
@@ -16,20 +16,24 @@ function Labs() {
 }
 
 async function getLabsInfo() {
-global.dis=[]
+var dia=momento.momento().day()
+global.dis=[];
+horas=[];
   for (const item of global.labslist) {
-    var c=await getCompusDisponibles(item)
-   //console.log(item,c);
-    global.dis.push(c)
+    var c=await getCompusDisponibles(item);
+   var d=await getHorasLibres(item,dia);
+    global.dis.push(c);
+    horas.push(d);
   }
   var labs=await Labs();
   var i=0;
    for (const item of labs) {
-     item['disponibles']=dis[i]
-     i++
+     item['disponibles']=dis[i];
+     item['horas_libres']=horas[i];
+     i++;
     }
 
-  return labs
+  return labs;
 }
 
 
@@ -41,6 +45,29 @@ async function getLabs() {
   responseG['info']=await getLabsInfo();
   resolve(JSON.stringify(responseG))
 });
+}
+
+function getHorasLibres(lab,dia) {
+  return new Promise(  function (resolve, reject) {
+    var res;
+    var lista=[];
+    mysqlConnection.query('select hora from Horario where idHorario=? and dia=? and clase=?',[lab,dia,"LIBRE"], (err, rows, fields) => {
+      if(!err)
+      {
+        res=rows;
+      }else
+      {
+        console.log(err);
+      }
+      for (const item of res) {
+        lista.push(item['hora'])
+      }
+      resolve(lista)
+    });
+
+
+  });
+  
 }
 
 function modCompu(id,lab,edo) {
@@ -307,3 +334,4 @@ module.exports.getCompusDisponibles=getCompusDisponibles;
 module.exports.getLabsInfo=getLabsInfo;
 module.exports.reservaTimeOut=reservaTimeOut;
 module.exports.getComputadoras=getComputadoras;
+module.exports.getHorasLibres=getHorasLibres;
