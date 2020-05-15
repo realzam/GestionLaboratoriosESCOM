@@ -75,6 +75,7 @@ async function scheduling()
   //peticiones.setComputadorasReservadas(dia,hora)
 }
 updateSocket.sendUpdateLabs();
+updateSocket.sendServerDate();
 timeOutSheduling=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
 
 }
@@ -140,7 +141,9 @@ io.on('connection',ws =>{
           break;
         case 'computadoras':
           res=await peticiones.getComputadoras(s[2])
-          console.log('computadoras',res)
+          break;
+        case 'infoS':
+          res=await updateSocket.sendServerDate();
           break;
         default:
           res="comando"

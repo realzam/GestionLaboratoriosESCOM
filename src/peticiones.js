@@ -43,8 +43,8 @@ async function getLabs() {
   responseG['comando']='/labs';
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
-  responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
-  responseG['hora_id']=utils.getHoraID(momento.momento())
+  /*responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
+  responseG['hora_id']=utils.getHoraID(momento.momento())*/
   resolve(JSON.stringify(responseG))
 });
 }
