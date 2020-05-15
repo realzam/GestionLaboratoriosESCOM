@@ -1,7 +1,7 @@
 var request = require('request');
 const momento= require('./momento.js');
 const mysqlConnection  = require('./database.js');
-
+const utils=require('./utils.js');
 
 function Labs() {
   return new Promise( async function (resolve, reject) {
@@ -43,6 +43,8 @@ async function getLabs() {
   responseG['comando']='/labs';
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
+  responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
+  responseG['hora_id']=utils.getHoraID(momento.momento())
   resolve(JSON.stringify(responseG))
 });
 }
