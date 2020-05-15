@@ -75,7 +75,8 @@ async function scheduling()
   //peticiones.setComputadorasReservadas(dia,hora)
 }
 updateSocket.sendUpdateLabs();
-updateSocket.sendServerDate();
+var dateS=updateSocket.sendServerDate();
+sendAll(dateS,null);
 timeOutSheduling=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
 
 }
