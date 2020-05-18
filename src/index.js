@@ -31,7 +31,7 @@ global.timersReserva=[];
 global.reservaTime=10;
 global.reservaTimeType='second';
 
-momento.setFecha(moment('2020-05-14T10:29:00'));
+//momento.setFecha(moment('2020-05-14T10:29:00'));
 utils.setTimersReservas();
 const server=app.listen(app.get('port'), () => {
   console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));

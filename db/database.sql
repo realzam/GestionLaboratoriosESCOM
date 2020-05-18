@@ -103,7 +103,3 @@ insert into Laboratorio() values(1105,'');
 insert into Laboratorio() values(1106,'');
 insert into Laboratorio() values(1107,'');
 insert into Laboratorio() values(2103,'');
-
-
-
-
