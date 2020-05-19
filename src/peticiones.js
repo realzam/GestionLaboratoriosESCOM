@@ -1,8 +1,7 @@
 var request = require('request');
 const momento= require('./momento.js');
 const mysqlConnection  = require('./database.js');
-const utils=require('./utils.js');
-
+const updateSocket=require('../sendUpdateSockets.js');
 function Labs() {
   return new Promise( async function (resolve, reject) {
     mysqlConnection.query('select idLaboratorio as id_laboratorio,estado from Laboratorio', (err, rows, fields) => {
@@ -245,6 +244,7 @@ function getreservaTimeOutNotification(date) {
         for (let i = 0; i < rows.length; i++) {
           const element = rows[i];
           await modCompu(element['idComputadora'],element['idLaboratorio'],'Disponible')
+          updateSocket.sendUpdateComputadoras(element['idLaboratorio'])
         }
         
         enviarNotificacion(rows)
