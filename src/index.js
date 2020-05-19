@@ -1,13 +1,13 @@
 const express = require('express');
 const path = require('path');
-const WebSocket= require('ws');
+const WebSocket = require('ws');
 const bodyParser = require('body-parser');
-const momento= require('./momento.js');
-const utils=require('./utils.js');
-const peticiones=require('./peticiones.js');
+const momento = require('./momento.js');
+const utils = require('./utils.js');
+const peticiones = require('./peticiones.js');
 var request = require('request');
-const moment= require('moment');
-const updateSocket=require('./sendUpdateSockets.js');
+const moment = require('moment');
+const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
 
 // Settings
@@ -25,88 +25,82 @@ app.use(require('./routes/views'));
 //global varibles
 var timeOutReserva;
 var timeOutSheduling;
-global.dis=[]
-global.labslist=[1105,1106,1107,2103];
-global.timersReserva=[];
-global.reservaTime=10;
-global.reservaTimeType='second';
+global.dis = []
+global.labslist = [1105, 1106, 1107, 2103];
+global.timersReserva = [];
+global.reservaTime = 10;
+global.reservaTimeType = 'second';
 
-//momento.setFecha(moment('2020-05-14T10:29:00'));
+momento.setFecha(moment('2020-05-18T09:49:00'));
 utils.setTimersReservas();
-const server=app.listen(app.get('port'), () => {
-  console.log('now',momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
+const server = app.listen(app.get('port'), () => {
+  console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
   scheduling();
   timerReserva(0);
-  setInterval(interval2, 1000*60*5);
+  setInterval(interval2, 1000 * 60 * 5);
 });
 
-async function scheduling()
-{
+async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   var hora;
-  var dia=momento.momento().day();
-  if(dia==6||dia==0)
- {
-  peticiones.setLaboratoriosEdo('No disponible',0);
-  peticiones.setComputadorasEdo('Ocupada',0);
- }else{
-  hora=utils.getHoraID(momento.momento());
-  if(hora==3||hora==9)
-  {
-    peticiones.setLaboratoriosEdo('Tiempo Libre',0);
-    peticiones.setComputadorasEdo('Disponible',0);
-  }else if(hora==0)
-  {
-    peticiones.setLaboratoriosEdo('No disponible',0);
-    peticiones.setComputadorasEdo('Ocupada',0);
-  }
-  else{
-    for (var i=0;i<global.labslist.length;i++) {
-      var edo=await peticiones.getLibreLaboratorio(labslist[i] ,hora,dia)
-        peticiones.modEdoLab(labslist[i],edo)
-        if(edo=="Tiempo libre")
-        {
-          peticiones.setComputadorasEdo('Disponible',labslist[i]);
-        }else{
-          peticiones.setComputadorasEdo('Ocupada',labslist[i]);
-        }
+  var dia = momento.momento().day();
+  if (dia == 6 || dia == 0) {
+    peticiones.setLaboratoriosEdo('No disponible', 0);
+    peticiones.setComputadorasEdo('Ocupada', 0);
+  } else {
+    hora = utils.getHoraID(momento.momento());
+    if (hora == 3 || hora == 9) {
+      peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
+      peticiones.setComputadorasEdo('Disponible', 0);
+    } else if (hora == 0) {
+      peticiones.setLaboratoriosEdo('No disponible', 0);
+      peticiones.setComputadorasEdo('Ocupada', 0);
     }
+    else {
+      for (var i = 0; i < global.labslist.length; i++) {
+        var edo = await peticiones.getLibreLaboratorio(labslist[i], hora, dia)
+        peticiones.modEdoLab(labslist[i], edo)
+        if (edo == "Tiempo libre") {
+          peticiones.setComputadorasEdo('Disponible', labslist[i]);
+        } else {
+          peticiones.setComputadorasEdo('Ocupada', labslist[i]);
+        }
+      }
+    }
+    //peticiones.setComputadorasReservadas(dia,hora)
   }
-  //peticiones.setComputadorasReservadas(dia,hora)
-}
-updateSocket.sendUpdateLabs();
-var dateS=updateSocket.sendServerDate();
-sendAll(dateS,null);
-timeOutSheduling=setTimeout(()=>{scheduling()},utils.nextTimer(momento.momento())-momento.momento())
+  updateSocket.sendUpdateLabs();
+  var dateS = updateSocket.sendServerDate();
+  sendAll(dateS, null);
+  timeOutSheduling = setTimeout(() => { scheduling() }, utils.nextTimer(momento.momento()) - momento.momento())
 
 }
 async function timerReserva(opc) {
   clearTimeout(timeOutReserva)
-  if(opc==2)
-  {
-    var formato='YYYY-MM-DD HH:mm:ss';
+  if (opc == 2) {
+    var formato = 'YYYY-MM-DD HH:mm:ss';
     await peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
     updateSocket.sendUpdateLabs();
-    if(global.timersReserva.length==0)
+    if (global.timersReserva.length == 0)
       utils.setTimersReservas()
 
   }
-  
-  timeOutReserva=setTimeout(()=>{timerReserva(2) },global.timersReserva[0]-momento.momento());
+
+  timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
 }
 
-function noop() {}
+function noop() { }
 
 function heartbeat() {
   this.isAlive = true;
 }
 
-let interval2 = ()=>{
-  console.log('hola mundo, no sleep',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
+let interval2 = () => {
+  console.log('hola mundo, no sleep', momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
-    if (!error && res.statusCode == 200) {}
+    if (!error && res.statusCode == 200) { }
   })
 }
 
@@ -123,39 +117,36 @@ const interval = setInterval(function ping() {
 
 
 const io = new WebSocket.Server({ server });
-CLIENTS=[];
+CLIENTS = [];
 
-io.on('connection',ws =>{
+io.on('connection', ws => {
   CLIENTS.push(ws);
   console.log('cliente nuevo')
   ws.isAlive = true;
   ws.on('pong', heartbeat);
-  ws.on('message',async (message)=>{
-    if(message.indexOf('/')!=-1)
-    {
-      var s=message.split('/');
+  ws.on('message', async (message) => {
+    if (message.indexOf('/') != -1) {
+      var s = message.split('/');
       var res;
-      switch(s[1])
-      {
+      switch (s[1]) {
         case 'labs':
-          res=await peticiones.getLabs('');
+          res = await peticiones.getLabs('');
           break;
         case 'computadoras':
-          res=await peticiones.getComputadoras(s[2])
+          res = await peticiones.getComputadoras(s[2])
           break;
         case 'infoS':
-          res=await updateSocket.sendServerDate();
+          res = await updateSocket.sendServerDate();
           break;
         default:
-          res="comando"
+          res = "comando"
           break
       }
-    }else
-    {
-     res="server say"+message
+    } else {
+      res = "server say" + message
     }
     ws.send(res);
-    sendAll(res,ws)
+    sendAll(res, ws)
   });
 
 });
@@ -165,15 +156,15 @@ io.on('close', function close() {
   clearInterval(interval);
 });
 
-function sendAll (message,yo) {
-  for (var i=0; i<CLIENTS.length; i++) {
-    if(CLIENTS[i]!=yo)
+function sendAll(message, yo) {
+  for (var i = 0; i < CLIENTS.length; i++) {
+    if (CLIENTS[i] != yo)
       CLIENTS[i].send(message);
   }
 }
 
 
-module.exports.timerReserva=timerReserva;
-module.exports.sendAll=sendAll;
+module.exports.timerReserva = timerReserva;
+module.exports.sendAll = sendAll;
 
 
