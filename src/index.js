@@ -29,8 +29,8 @@ global.dis = []
 global.labslist = [1105, 1106, 1107, 2103];
 global.timersReserva = [];
 global.reservaTime = 10;
-global.reservaTimeType = 'second';
-
+global.reservaTimeType = 'minute';
+//moment().add(1,'minute')
 momento.setFecha(moment('2020-05-19T12:09:00'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), () => {

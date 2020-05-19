@@ -181,7 +181,7 @@ router.post('/reservaComputadora', async (req, res) => {
   }
   
  
-  mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo],async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo],(err, rows, fields) => {
     if(!err) {
       console.log('reserva hecha');
       res.json({status: "reserva hecha"});
