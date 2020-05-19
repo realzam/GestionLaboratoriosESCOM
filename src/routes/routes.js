@@ -175,6 +175,7 @@ router.post('/reservaComputadora', async (req, res) => {
    utils.addTimerReserva(fin)
    await peticiones.modCompu(compu,lab,'Reservada')
    updateSocket.sendUpdateLabs();
+   updateSocket.sendUpdateComputadoras(lab)
   }else
   {
     var fin=utils.getDateFromID(hora).add(global.reservaTime,global.reservaTimeType)
