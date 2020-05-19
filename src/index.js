@@ -121,7 +121,7 @@ CLIENTS = [];
 
 io.on('connection', ws => {
   CLIENTS.push(ws);
-  console.log('cliente nuevo',CLIENTS.length)
+  console.log('cliente nuevo')
   ws.isAlive = true;
   ws.on('pong', heartbeat);
   ws.on('message', async (message) => {
@@ -157,6 +157,7 @@ io.on('close', function close() {
 });
 
 function sendAll(message, yo) {
+  console.log('send to',CLIENTS.length)
   for (var i = 0; i < CLIENTS.length; i++) {
     if (CLIENTS[i] != yo)
       CLIENTS[i].send(message);
