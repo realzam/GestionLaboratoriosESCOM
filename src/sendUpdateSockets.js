@@ -8,6 +8,13 @@ async function sendUpdateLabs()
   index.sendAll(res,null)
 }
 
+async function sendUpdateComputadoras(lab)
+{
+  var res= await peticiones.getComputadoras(lab)
+  index.sendAll(res,null)
+}
+
+
  function sendServerDate()
 {
   return new Promise(resolve => {
@@ -22,3 +29,4 @@ async function sendUpdateLabs()
 
 module.exports.sendUpdateLabs=sendUpdateLabs;
 module.exports.sendServerDate=sendServerDate;
+module.exports.sendUpdateComputadoras=sendUpdateComputadoras;

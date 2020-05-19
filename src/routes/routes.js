@@ -23,6 +23,7 @@ router.put('/modifyComputadora/:id', (req, res) => {
   const {lab, edo} = req.body;
   mysqlConnection.query('update Computadora set estado = ? where idComputadora=? and idLaboratorio=?', [edo,id,lab], (err, rows, fields) => {
     if (!err) {
+      updateSocket.sendUpdateComputadoras(lab)
       res.json({status: "Computadora modificada"});
     } else {
       console.log(err);
