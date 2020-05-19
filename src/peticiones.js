@@ -309,7 +309,7 @@ function getComputadoras(lab)
 
  
   return new Promise(resolve => {
-    mysqlConnection.query('select idComptadora as id_computadora,idLaboratorio as id_laboratorio,estado from Computadora where idLaboratorio=? order by idComputadora',[lab], (err, rows, fields) => {
+    mysqlConnection.query('select idComputadora as id_computadora,idLaboratorio as id_laboratorio,estado from Computadora where idLaboratorio=? order by idComputadora',[lab], (err, rows, fields) => {
       if (!err) {
         responseG['ok']=true;
         responseG['info']=rows
