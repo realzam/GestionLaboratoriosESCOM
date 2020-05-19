@@ -159,11 +159,11 @@ function modComputadoraEdo(edo,lab) {
 }
 
 function setComputadorasReservadas(dia,hora,) {
-  var sql="update Computadora as c,ReservaComputadora as r set c.estado='Reservada' where r.estado='En espera' and r.dia=? and r.hora=? and r.idLaboratorio=c.idLaboratorio and r.idComputadora=c.idComputadora"
+  var sql="update Computadora c,ReservaComputadora r set c.estado='Reservada' where r.estado='En espera' and r.dia=? and r.hora=? and r.idLaboratorio=c.idLaboratorio and r.idComputadora=c.idComputadora"
   return new Promise(function (resolve, reject) {
     mysqlConnection.query(sql, [dia,hora], (err, rows, fields) => {
       if (!err) {
-        console.log('reservar hechas')
+        console.log('reservar hechas:',rows['changedRows'])
       }else{
         console.log(err)
       }
