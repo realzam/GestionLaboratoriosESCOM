@@ -1,7 +1,7 @@
 var request = require('request');
 const momento= require('./momento.js');
 const mysqlConnection  = require('./database.js');
-const updateSocket=require('../sendUpdateSockets.js');
+const updateSocket=require('./sendUpdateSockets.js');
 function Labs() {
   return new Promise( async function (resolve, reject) {
     mysqlConnection.query('select idLaboratorio as id_laboratorio,estado from Laboratorio', (err, rows, fields) => {
