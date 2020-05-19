@@ -160,7 +160,7 @@ router.put('/modifyToken/:id', (req, res) => {
 });
 
 
-router.post('/reservaComputadora', (req, res) => {
+router.post('/reservaComputadora', async (req, res) => {
   
   
   const {usuario,compu,lab,dia,hora} = req.body;
