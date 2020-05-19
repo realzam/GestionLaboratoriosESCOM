@@ -344,8 +344,8 @@ function getComputadorasFuture(lab,hora)
       var index=reservadas.indexOf(i);
       var compu={}
       compu["id_computadora"]=i;
-      compu["id_laboratorio"]=lab;
-      compu["id_laboratorio"]=(index!=-1)?'No diponible':'Disponible';
+      compu["id_laboratorio"]=parseInt(lab);
+      compu["estado"]=(index!=-1)?'No diponible':'Disponible';
       compusl.push(compu);
     }
     responseG['info']=compusl;
