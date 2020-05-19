@@ -121,7 +121,7 @@ CLIENTS = [];
 
 io.on('connection', ws => {
   CLIENTS.push(ws);
-  console.log('cliente nuevo')
+  console.log('cliente nuevo',CLIENTS.length)
   ws.isAlive = true;
   ws.on('pong', heartbeat);
   ws.on('message', async (message) => {
