@@ -157,7 +157,6 @@ io.on('close', function close() {
 });
 
 function sendAll(message, yo) {
-  console.log('send to',CLIENTS.length)
   for (var i = 0; i < CLIENTS.length; i++) {
     if (CLIENTS[i] != yo)
       CLIENTS[i].send(message);
