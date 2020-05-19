@@ -173,7 +173,8 @@ router.post('/reservaComputadora', (req, res) => {
 
     var fin=inicio.clone().add(global.reservaTime,global.reservaTimeType)
    utils.addTimerReserva(fin)
-   
+   await peticiones.modCompu(compu,lab,'Reservada')
+   updateSocket.sendUpdateLabs();
   }else
   {
     var fin=utils.getDateFromID(hora).add(global.reservaTime,global.reservaTimeType)
@@ -183,8 +184,6 @@ router.post('/reservaComputadora', (req, res) => {
   mysqlConnection.query(query, [usuario,compu,lab,inicio.format(formato),dia,hora,fin.format(formato),edo],async (err, rows, fields) => {
     if(!err) {
       console.log('reserva hecha');
-      await peticiones.modCompu(compu,lab,'Reservada')
-      updateSocket.sendUpdateLabs();
       res.json({status: "reserva hecha"});
           
     } else {

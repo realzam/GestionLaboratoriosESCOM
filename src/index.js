@@ -67,7 +67,7 @@ async function scheduling() {
         }
       }
     }
-    //peticiones.setComputadorasReservadas(dia,hora)
+    peticiones.setComputadorasReservadas(dia,hora)
   }
   updateSocket.sendUpdateLabs();
   var dateS = updateSocket.sendServerDate();
