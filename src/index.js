@@ -132,7 +132,10 @@ io.on('connection', ws => {
           res = await peticiones.getLabs('');
           break;
         case 'computadoras':
-          res = await peticiones.getComputadoras(s[2])
+          res = await peticiones.getComputadoras(s[2])// /computadora/lab
+          break;
+        case 'computadorasFuture':
+          res = await peticiones.getComputadorasFuture(s[2],s[3])// /computadorasFuture/lab/hora
           break;
         case 'infoS':
           res = await updateSocket.sendServerDate();

@@ -14,6 +14,12 @@ async function sendUpdateComputadoras(lab)
   index.sendAll(res,null)
 }
 
+async function sendUpdateComputadorasFuture(lab,hora)
+{
+  var res= await peticiones.getComputadorasFuture(lab,hora);
+  index.sendAll(res,null);
+  console.log('send future 2');
+}
 
  function sendServerDate()
 {
@@ -30,3 +36,4 @@ async function sendUpdateComputadoras(lab)
 module.exports.sendUpdateLabs=sendUpdateLabs;
 module.exports.sendServerDate=sendServerDate;
 module.exports.sendUpdateComputadoras=sendUpdateComputadoras;
+module.exports.sendUpdateComputadorasFuture=sendUpdateComputadorasFuture;

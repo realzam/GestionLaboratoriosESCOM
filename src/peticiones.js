@@ -305,9 +305,6 @@ function getComputadoras(lab)
 {
   var responseG={}
   responseG['comando']='/computadoras';
-  
-
- 
   return new Promise(resolve => {
     mysqlConnection.query('select idComputadora as id_computadora,idLaboratorio as id_laboratorio,estado from Computadora where idLaboratorio=? order by idComputadora',[lab], (err, rows, fields) => {
       if (!err) {
@@ -318,6 +315,41 @@ function getComputadoras(lab)
        console.log(err)
      }
    });
+  });
+}
+function getComputadorasReservadas(lab,hora) {
+  return new Promise(resolve => {
+  mysqlConnection.query('select idComputadora  from ReservaComputadora where idLaboratorio=? and hora=? and estado="En espera" order by idComputadora',[lab,hora], (err, rows, fields) => {
+    if (!err) {
+        resolve(rows)
+    }else{
+      console.log(err)
+    }
+  });
+});
+}
+function getComputadorasFuture(lab,hora)
+{
+  return new Promise( async function (resolve, reject) {
+      var responseG={}
+      responseG['comando']='/computadorasFuture';
+      responseG['ok']=true;
+      var compusl=[];
+      var res=await getComputadorasReservadas(lab,hora);
+      var reservadas=[];
+    for (const item of res) {
+      reservadas.push(item['idComputadora']);
+    }
+    for (let i = 1; i <= 34; i++) {
+      var index=reservadas.indexOf(i);
+      var compu={}
+      compu["id_computadora"]=i;
+      compu["id_laboratorio"]=lab;
+      compu["id_laboratorio"]=(index!=-1)?'No diponible':'Disponible';
+      compusl.push(compu);
+    }
+    responseG['info']=compusl;
+    resolve(JSON.stringify(responseG))
   });
 }
 
@@ -336,4 +368,5 @@ module.exports.getCompusDisponibles=getCompusDisponibles;
 module.exports.getLabsInfo=getLabsInfo;
 module.exports.reservaTimeOut=reservaTimeOut;
 module.exports.getComputadoras=getComputadoras;
+module.exports.getComputadorasFuture=getComputadorasFuture;
 module.exports.getHorasLibres=getHorasLibres;
