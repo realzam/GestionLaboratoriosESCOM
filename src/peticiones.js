@@ -353,6 +353,19 @@ function getComputadorasFuture(lab,hora)
   });
 }
 
+function getReservasEnEspera()
+{
+  return new Promise( async function (resolve, reject) {
+    mysqlConnection.query('select fin  from ReservaComputadora where estado="En espera" order by 1', (err, rows, fields) => {
+      if (!err) {
+          resolve(rows)
+      }else{
+        console.log(err)
+      }
+    });
+  });
+}
+
 
 module.exports.getLabs=getLabs;
 module.exports.modCompu=modCompu;
@@ -370,3 +383,4 @@ module.exports.reservaTimeOut=reservaTimeOut;
 module.exports.getComputadoras=getComputadoras;
 module.exports.getComputadorasFuture=getComputadorasFuture;
 module.exports.getHorasLibres=getHorasLibres;
+module.exports.getReservasEnEspera=getReservasEnEspera;

@@ -23,7 +23,7 @@ function momento()
     
 }
 function setFecha(param) {
-    fecha=param;
+    fecha=param;//moment()
     init=moment(moment().tz("America/Mexico_City").format('YYYY-MM-DTHH:mm:ss.SSS'))
 }
 

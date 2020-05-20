@@ -6,6 +6,8 @@ const utils=require('../utils.js');
 const momento= require('../momento.js');
 const updateSocket=require('../sendUpdateSockets.js');
 const peticiones=require('../peticiones.js');
+const index = require('../index.js');
+const moment = require('moment');
 // GET
 
 router.get('/', async (req, res) => {
@@ -199,5 +201,17 @@ router.post('/reservaComputadora', async (req, res) => {
   });
 });
 
+
+
+router.post('/hora', async (req, res) => {
+  const { fecha,hora } = req.body;//2020-05-19T12:09:00
+  console.log('/hora');
+  if(req.body==null||fecha==null||hora==null)
+    momento.setFecha(null);
+  else
+  momento.setFecha(moment(fecha+'T'+hora));
+  index.setHoraRoute();
+  res.json({fecha:momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS')});
+});
 
 module.exports = router;

@@ -155,7 +155,6 @@ function setTimersReservas() {
     global.timersReserva.push(aux);
  
   }
-  printTimersReservas();
 }
 function printTimersReservas()
 {

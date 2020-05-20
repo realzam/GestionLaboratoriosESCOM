@@ -29,16 +29,28 @@ global.dis = []
 global.labslist = [1105, 1106, 1107, 2103];
 global.timersReserva = [];
 global.reservaTime = 10;
-global.reservaTimeType = 'second';// second  minute
-momento.setFecha(moment('2020-05-19T12:09:00'));
+global.reservaTimeType = 'minute';// second  minute
+
+//momento.setFecha(moment('2020-05-19T12:09:00'));
 utils.setTimersReservas();
-const server = app.listen(app.get('port'), () => {
+const server = app.listen(app.get('port'), async() => {
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
+  var resp =await peticiones.getReservasEnEspera();
+  for (const item of resp) {
+    global.timersReserva.push(moment(item['fin']));
+  }
+  global.timersReserva.sort();
   scheduling();
   timerReserva(0);
   setInterval(interval2, 1000 * 60 * 5);
 });
-
+function setHoraRoute()
+{
+  clearTimeout(timeOutReserva)
+  clearTimeout(timeOutSheduling)
+  scheduling();
+  timerReserva(2);
+}
 async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   var hora;
@@ -83,9 +95,8 @@ async function timerReserva(opc) {
     updateSocket.sendUpdateLabs();
     if (global.timersReserva.length == 0)
       utils.setTimersReservas()
-
   }
-
+  
   timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
 }
@@ -168,5 +179,6 @@ function sendAll(message, yo) {
 
 module.exports.timerReserva = timerReserva;
 module.exports.sendAll = sendAll;
+module.exports.setHoraRoute=setHoraRoute;
 
 
