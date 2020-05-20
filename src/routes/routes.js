@@ -165,12 +165,13 @@ router.put('/modifyToken/:id', (req, res) => {
 router.post('/reservaComputadora', async (req, res) => {
   
   
-  const {usuario,compu,lab,dia,hora} = req.body;
+  const {usuario,compu,lab,hora} = req.body;
   var edo="En espera"
   const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
   var inicio=momento.momento();
   var formato='YYYY-MM-DD HH:mm:ss';
   var updateType=0;
+  var dia=momento.momento().day()
   if(utils.compareDate(inicio,utils.getDateFromID(hora))==inicio)
   {
  
