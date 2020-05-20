@@ -46,10 +46,14 @@ const server = app.listen(app.get('port'), async() => {
 });
 function setHoraRoute()
 {
-  clearTimeout(timeOutReserva)
-  clearTimeout(timeOutSheduling)
+  clearTimeout(timeOutReserva);
+  clearTimeout(timeOutSheduling);
   scheduling();
   timerReserva(2);
+  var res = await updateSocket.sendServerDate();
+  sendAll(res,null);
+  updateSocket.sendUpdateLabs();
+  
 }
 async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
@@ -96,7 +100,9 @@ async function timerReserva(opc) {
     if (global.timersReserva.length == 0)
       utils.setTimersReservas()
   }
-  
+  updateSocket.sendUpdateLabs();
+  var dateS = updateSocket.sendServerDate();
+  sendAll(dateS, null);
   timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
 }
