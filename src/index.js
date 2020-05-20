@@ -44,7 +44,7 @@ const server = app.listen(app.get('port'), async() => {
   timerReserva(0);
   setInterval(interval2, 1000 * 60 * 5);
 });
-function setHoraRoute()
+async function setHoraRoute()
 {
   clearTimeout(timeOutReserva);
   clearTimeout(timeOutSheduling);
@@ -85,7 +85,7 @@ async function scheduling() {
     peticiones.setComputadorasReservadas(dia,hora)
   }
   updateSocket.sendUpdateLabs();
-  var dateS = updateSocket.sendServerDate();
+  var dateS = await updateSocket.sendServerDate();
   sendAll(dateS, null);
   timeOutSheduling = setTimeout(() => { scheduling() }, utils.nextTimer(momento.momento()) - momento.momento())
 
@@ -101,7 +101,7 @@ async function timerReserva(opc) {
       utils.setTimersReservas()
   }
   updateSocket.sendUpdateLabs();
-  var dateS = updateSocket.sendServerDate();
+  var dateS = await updateSocket.sendServerDate();
   sendAll(dateS, null);
   timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
