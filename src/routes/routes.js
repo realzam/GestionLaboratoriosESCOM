@@ -183,15 +183,15 @@ router.post('/reservaComputadora', async (req, res) => {
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
-        res.json({ status: "reserva hecha" });
+        res.json({ message: "Reserva hecha",status:0 });
         reservaContinue(type, hora, compu, lab, fin)
       }
       else
-        res.json({ status: "Computadora no disponible" });
+        res.json({ message: "Computadora no disponible",status:1});
 
     } else {
       console.log(err);
-      res.json({ eror: "Ups hubo un error :(" });
+      res.json({ message: "Ups hubo un error",status:2 });
     }
   });
 });
