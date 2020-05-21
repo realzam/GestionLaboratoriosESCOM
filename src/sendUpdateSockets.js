@@ -28,12 +28,28 @@ async function sendUpdateComputadorasFuture(lab,hora)
     responseG['comando']="/infoS"
     responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
     responseG['hora_id']=utils.getHoraID(momento.momento())
-    res=JSON.stringify(responseG);
+    var res=JSON.stringify(responseG);
     resolve(res)
   });
 }
 
+ function sendReserva(boleta)
+{
+  return new Promise( async function (resolve, reject) {
+    responseG={};
+    responseG['comando']="/miReserva"
+    var info=await peticiones.miReserva(boleta);
+    if(info.length>0)
+    responseG['info']=info[0];
+    else
+    responseG['status']=false;
+
+    var res=JSON.stringify(responseG);
+    resolve(res)
+  });
+}
 module.exports.sendUpdateLabs=sendUpdateLabs;
 module.exports.sendServerDate=sendServerDate;
 module.exports.sendUpdateComputadoras=sendUpdateComputadoras;
 module.exports.sendUpdateComputadorasFuture=sendUpdateComputadorasFuture;
+module.exports.sendReserva=sendReserva;

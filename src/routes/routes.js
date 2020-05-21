@@ -15,29 +15,6 @@ router.get('/', async (req, res) => {
   res.json(labs);
 });
 
-router.get('/miReserva/:boleta', async (req, res) => {
-  const {boleta} = req.params;
-  console.log(boleta);
-  
-  mysqlConnection.query('select idUsuario as id_usuario,idComputadora as id_computadora,idLaboratorio as id_laboratorio,inicio,dia,hora,fin,estado from ReservaComputadora where idUsuario=? and (estado="En espera" or estado="En uso")', [boleta], (err, rows, fields) => {
-    if (!err) {
-      if(rows.length>0)
-      {
-        console.log('row',rows[0]);
-        res.json({status:0,info:rows[0]});
-      }else
-      {
-        res.json({status:1,message:"No tienes reservas"});
-      }
-      
-    } else {
-      console.log(err);
-      res.json({ status:2, message: "ups hubo algun error :(" });
-    }
-  });
-
-});
-
 
 
 router.put('/modifyComputadora/:id', (req, res) => {
@@ -202,6 +179,10 @@ router.post('/reservaComputadora', async (req, res) => {
     var fin = utils.getDateFromID(hora).add(global.reservaTime, global.reservaTimeType);
     type = 2;
   }
+  var res = await peticiones.miReserva(boleta);
+  if(res.length>0)
+  res.json({ message: "Ya tienes un reserva",status:2 });
+  
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {

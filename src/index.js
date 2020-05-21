@@ -158,9 +158,9 @@ io.on('connection', ws => {
         case 'infoS':
           res = await updateSocket.sendServerDate();
           break;
-          case'echoPrivate':
+          case 'miReserva':
           privado=true;
-          res=s[2];
+          res=await updateSocket.sendReserva(s[2]);
           break;
         default:
           res = "comando"
