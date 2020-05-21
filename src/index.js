@@ -141,6 +141,7 @@ io.on('connection', ws => {
   ws.isAlive = true;
   ws.on('pong', heartbeat);
   ws.on('message', async (message) => {
+    var privado=false;
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
       var res;
@@ -157,15 +158,21 @@ io.on('connection', ws => {
         case 'infoS':
           res = await updateSocket.sendServerDate();
           break;
+          case'echoPrivate':
+          privado=true;
+          res=s[2];
+          break;
         default:
           res = "comando"
           break
       }
     } else {
-      res = "server say" + message
+      privado=true;
+      res = "server echo say" + message
     }
     ws.send(res);
-    sendAll(res, ws)
+    if(!privado)
+      sendAll(res, ws)
   });
 
 });
