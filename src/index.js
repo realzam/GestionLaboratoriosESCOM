@@ -162,9 +162,6 @@ io.on('connection', ws => {
           privado=true;
           res=await updateSocket.sendReserva(s[2]);
           break;
-        default:
-          res = "comando"
-          break
       }
     } else {
       privado=true;
