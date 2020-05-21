@@ -144,7 +144,7 @@ io.on('connection', ws => {
     if (message.indexOf('/') != -1) {
       var spli = message.split('/');
       var res;
-      switch (spli) {
+      switch (spli[0]) {
         case 'labs':
           res = await peticiones.getLabs();
           break;
