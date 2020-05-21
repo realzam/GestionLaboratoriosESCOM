@@ -33,9 +33,9 @@ global.reservaTimeType = 'minute';// second  minute
 
 //momento.setFecha(moment('2020-05-19T12:09:00'));
 utils.setTimersReservas();
-const server = app.listen(app.get('port'), async() => {
+const server = app.listen(app.get('port'), async () => {
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
-  var resp =await peticiones.getReservasEnEspera();
+  var resp = await peticiones.getReservasEnEspera();
   for (const item of resp) {
     global.timersReserva.push(moment(item['fin']));
   }
@@ -44,16 +44,15 @@ const server = app.listen(app.get('port'), async() => {
   timerReserva(0);
   setInterval(interval2, 1000 * 60 * 5);
 });
-async function setHoraRoute()
-{
+async function setHoraRoute() {
   clearTimeout(timeOutReserva);
   clearTimeout(timeOutSheduling);
   scheduling();
   timerReserva(2);
   var res = await updateSocket.sendServerDate();
-  sendAll(res,null);
+  sendAll(res, null);
   updateSocket.sendUpdateLabs();
-  
+
 }
 async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
@@ -82,7 +81,7 @@ async function scheduling() {
         }
       }
     }
-    peticiones.setComputadorasReservadas(dia,hora)
+    peticiones.setComputadorasReservadas(dia, hora)
   }
   updateSocket.sendUpdateLabs();
   var dateS = await updateSocket.sendServerDate();
@@ -141,34 +140,34 @@ io.on('connection', ws => {
   ws.isAlive = true;
   ws.on('pong', heartbeat);
   ws.on('message', async (message) => {
-    var privado=false;
+    var privado = false;
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
       var res;
       switch (s[1]) {
         case 'labs':
-          res = await peticiones.getLabs('');
+          res = await peticiones.getLabs();
           break;
         case 'computadoras':
           res = await peticiones.getComputadoras(s[2])// /computadora/lab
           break;
         case 'computadorasFuture':
-          res = await peticiones.getComputadorasFuture(s[2],s[3])// /computadorasFuture/lab/hora
+          res = await peticiones.getComputadorasFuture(s[2], s[3])// /computadorasFuture/lab/hora
           break;
         case 'infoS':
           res = await updateSocket.sendServerDate();
           break;
-          case 'miReserva':
-          privado=true;
-          res=await updateSocket.sendReserva(s[2]);
+        case 'miReserva':
+          privado = true;
+          res = await updateSocket.sendReserva(s[2]);
           break;
       }
     } else {
-      privado=true;
+      privado = true;
       res = "server echo say" + message
     }
     ws.send(res);
-    if(!privado)
+    if (!privado)
       sendAll(res, ws)
   });
 
@@ -189,6 +188,6 @@ function sendAll(message, yo) {
 
 module.exports.timerReserva = timerReserva;
 module.exports.sendAll = sendAll;
-module.exports.setHoraRoute=setHoraRoute;
+module.exports.setHoraRoute = setHoraRoute;
 
 
