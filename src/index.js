@@ -142,22 +142,34 @@ io.on('connection', ws => {
   ws.on('message', async (message) => {
     var privado = false;
     if (message.indexOf('/') != -1) {
-      var spli = message.split('/');
-      var res;
-      console.log('spli 1',spli[1],spli[1]=='labs');
-      
-      switch (spli[1]) {
+      var s = message.split('/');
+      var res; 
+      switch (s[1]) {
         case 'labs':
-          console.log('/labs');
           res = await peticiones.getLabs();
+          console.log('res sokect mesage',res)
           break;
-      
+        case 'computadoras':
+          res = await peticiones.getComputadoras(s[2])// /computadora/lab
+          break;
+        case 'computadorasFuture':
+          res = await peticiones.getComputadorasFuture(s[2], s[3])// /computadorasFuture/lab/hora
+          break;
+        case 'infoS':
+          res = await updateSocket.sendServerDate();
+          break;
+        case 'miReserva':
+          privado = true;
+          res = await updateSocket.sendReserva(s[2]);
+          break;
         default:
+          res="Comando"
           break;
       }
     } else {
-      res = "server echo say" + message
+      res = "server  say" + message
     }
+    if (typeof res === 'string' || res instanceof String)
     ws.send(res);
     if (!privado)
       sendAll(res, ws)
