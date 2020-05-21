@@ -19,7 +19,7 @@ router.get('/miReserva/:boleta', async (req, res) => {
   const {boleta} = req.params;
   console.log(boleta);
   
-  mysqlConnection.query('select * from ReservaComputadora where idUsuario=? and (estado="En espera" or estado="En uso")', [boleta], (err, rows, fields) => {
+  mysqlConnection.query('select idUsuario as id_usuario,idComputadora as id_computadora,idLaboratorio as id_laboratorio,inicio,dia,hora,fin,estado from ReservaComputadora where idUsuario=? and (estado="En espera" or estado="En uso")', [boleta], (err, rows, fields) => {
     if (!err) {
       if(rows.length>0)
       {
