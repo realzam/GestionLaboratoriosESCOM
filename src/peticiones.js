@@ -36,14 +36,13 @@ horas=[];
 }
 
 
-async function getLabs() {
+ function getLabs() {
   return new Promise( async function (resolve, reject) {
   var responseG={}
   responseG['comando']='/labs';
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
-  /*responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
-  responseG['hora_id']=utils.getHoraID(momento.momento())*/
+  console.log('get lab function info', responseG['info'])
   resolve(JSON.stringify(responseG))
 });
 }

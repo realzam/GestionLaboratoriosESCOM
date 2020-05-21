@@ -147,6 +147,7 @@ io.on('connection', ws => {
       switch (s[1]) {
         case 'labs':
           res = await peticiones.getLabs();
+          console.log('res sokect mesage',res)
           break;
         case 'computadoras':
           res = await peticiones.getComputadoras(s[2])// /computadora/lab
