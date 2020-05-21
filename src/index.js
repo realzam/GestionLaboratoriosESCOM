@@ -144,12 +144,17 @@ io.on('connection', ws => {
     if (message.indexOf('/') != -1) {
       var spli = message.split('/');
       var res;
-      switch (spli[0]) {
+      console.log('spli 0',spli[1],spli[1]==labs);
+      
+      switch (spli[1]) {
         case 'labs':
+          console.log('/labs');
           res = await peticiones.getLabs();
           break;
       
         default:
+          console.log('/labs');
+          res = await peticiones.getLabs();
           break;
       }
     } else {
