@@ -42,7 +42,6 @@ horas=[];
   responseG['comando']='/labs';
   responseG['ok']=true;
   responseG['info']=await getLabsInfo();
-  console.log('get lab function info', responseG['info'])
   resolve(JSON.stringify(responseG))
 });
 }
