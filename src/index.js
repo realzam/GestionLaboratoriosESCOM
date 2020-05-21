@@ -162,9 +162,11 @@ io.on('connection', ws => {
           privado = true;
           res = await updateSocket.sendReserva(s[2]);
           break;
+        default:
+          res="Comando"
+          break;
       }
     } else {
-      privado = true;
       res = "server echo say" + message
     }
     ws.send(res);
@@ -180,10 +182,14 @@ io.on('close', function close() {
 });
 
 function sendAll(message, yo) {
-  for (var i = 0; i < CLIENTS.length; i++) {
-    if (CLIENTS[i] != yo)
-      CLIENTS[i].send(message);
+  if (typeof message === 'string' || message instanceof String)
+  {
+    for (var i = 0; i < CLIENTS.length; i++) {
+      if (CLIENTS[i] != yo)
+        CLIENTS[i].send(message);
+    }
   }
+  
 }
 
 
