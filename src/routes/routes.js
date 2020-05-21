@@ -179,10 +179,10 @@ router.post('/reservaComputadora', async (req, res) => {
     var fin = utils.getDateFromID(hora).add(global.reservaTime, global.reservaTimeType);
     type = 2;
   }
-  var res = await peticiones.miReserva(boleta);
+  var res = await peticiones.miReserva(usuario);
   if(res.length>0)
   res.json({ message: "Ya tienes un reserva",status:2 });
-  
+
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
