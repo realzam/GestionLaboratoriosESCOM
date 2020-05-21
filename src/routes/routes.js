@@ -15,6 +15,28 @@ router.get('/', async (req, res) => {
   res.json(labs);
 });
 
+router.get('/miReserva/:boleta', async (req, res) => {
+  const {boleta} = req.params;
+  console.log(boleta);
+  
+  mysqlConnection.query('select * from ReservaComputadora where idUsuario=? and (estado="En espera" or estado="En uso")', [boleta], (err, rows, fields) => {
+    if (!err) {
+      if(rows.length>0)
+      {
+        console.log('row',rows[0]);
+        res.json({status:0,info:rows[0]});
+      }else
+      {
+        res.json({status:1,message:"No tienes reservas"});
+      }
+      
+    } else {
+      console.log(err);
+      res.json({ status:2, message: "ups hubo algun error :(" });
+    }
+  });
+
+});
 
 
 
