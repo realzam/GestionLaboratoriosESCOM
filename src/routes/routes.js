@@ -181,7 +181,10 @@ router.post('/reservaComputadora', async (req, res) => {
   }
   var resp = await peticiones.miReserva(usuario);
   if(resp.length>0)
-  res.json({ message: "Ya tienes un reserva",status:2 });
+  {
+    res.json({ message: "Ya tienes un reserva",status:2 });
+    return 0
+  }
 
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
     if (!err) {
