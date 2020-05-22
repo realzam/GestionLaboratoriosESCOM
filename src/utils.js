@@ -156,14 +156,15 @@ function setTimersReservas() {
  
   }
 }
+
 function printTimersReservas()
 {
   for (let i = 0; i < global.timersReserva.length; i++) {
     const element = global.timersReserva[i];
     console.log(element.format('dddd DD MMMM YYYY H:mm:ss'))
-    
   }
 }
+
 module.exports.nextTimer=nextTimer;
 module.exports.compareDate=compareDate;
 module.exports.getHoraID=getHoraID;

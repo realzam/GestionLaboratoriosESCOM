@@ -216,9 +216,20 @@ async function reservaContinue(type, hora, compu, lab, fin) {
     console.log('type',type)
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
-    
-
 }
+
+router.put('/cancelarReserva/:boleta', (req, res) => {
+  const { boleta } = req.params;
+  const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
+  mysqlConnection.query(query, [boleta], (err, rows, fields) => {
+    if (!err) {
+      updateSocket.sendUpdateReserva(boleta);
+      res.json({ status: "Reserva cancelada" });
+    } else {
+      console.log(err);
+    }
+  });
+});
 
 router.post('/hora', async (req, res) => {
   const { fecha, hora } = req.body;//2020-05-19T12:09:00

@@ -135,12 +135,17 @@ const io = new WebSocket.Server({ server });
 CLIENTS = [];
 
 io.on('connection', ws => {
+  ws.on('disconnect', function(){
+    console.log('adios');
+    
+  });
   CLIENTS.push(ws);
   console.log('cliente nuevo')
   ws.isAlive = true;
   ws.hola = 'mundo ' + Math.floor((Math.random() * 100) + 1);
   ws.on('pong', heartbeat);
   ws.idCliente = 'anonimo'
+  //isAliveClient();
   ws.on('message', async (message) => {
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
@@ -187,9 +192,31 @@ io.on('close', function close() {
   clearInterval(interval);
 });
 
+io.on('disconnect', function(){
+  console.log('adios');
+});
+
+io.once('disconnect', function () {
+  console.log('adios server');
+});
+function isAliveClient() {
+  console.log('================================')
+ for (let i = 0; i < CLIENTS.length; ) {
+   console.log(i,CLIENTS.length)
+   if(CLIENTS[i].readyState==3)
+   {
+     console.log('eliminando de la lista')
+    CLIENTS.splice(i, 1);
+    continue;
+   }
+   i++
+ }
+}
+
 function sendAll(message, yo, to) {
   if (typeof message === 'string' || message instanceof String) {
     for (var i = 0; i < CLIENTS.length; i++) {
+      
       if (CLIENTS[i] != yo) {
         if (to != null) {
           if (CLIENTS[i].idCliente == to)
