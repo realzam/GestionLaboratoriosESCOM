@@ -50,7 +50,7 @@ async function setHoraRoute() {
   scheduling();
   timerReserva(2);
   var res = await updateSocket.sendServerDate();
-  sendAll(res, null);
+  sendAll(res, null, null);
   updateSocket.sendUpdateLabs();
 
 }
@@ -85,7 +85,7 @@ async function scheduling() {
   }
   updateSocket.sendUpdateLabs();
   var dateS = await updateSocket.sendServerDate();
-  sendAll(dateS, null);
+  sendAll(dateS, null, null);
   timeOutSheduling = setTimeout(() => { scheduling() }, utils.nextTimer(momento.momento()) - momento.momento())
 
 }
@@ -101,7 +101,7 @@ async function timerReserva(opc) {
   }
   updateSocket.sendUpdateLabs();
   var dateS = await updateSocket.sendServerDate();
-  sendAll(dateS, null);
+  sendAll(dateS, null, null);
   timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
 }
@@ -138,16 +138,17 @@ io.on('connection', ws => {
   CLIENTS.push(ws);
   console.log('cliente nuevo')
   ws.isAlive = true;
+  ws.hola = 'mundo ' + Math.floor((Math.random() * 100) + 1);
   ws.on('pong', heartbeat);
+  ws.idCliente = 'anonimo'
   ws.on('message', async (message) => {
-    var privado = false;
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
-      var res; 
+      var res;
+      var para = null;
       switch (s[1]) {
         case 'labs':
           res = await peticiones.getLabs();
-          console.log('res sokect mesage',res)
           break;
         case 'computadoras':
           res = await peticiones.getComputadoras(s[2])// /computadora/lab
@@ -159,20 +160,24 @@ io.on('connection', ws => {
           res = await updateSocket.sendServerDate();
           break;
         case 'miReserva':
-          privado = true;
-          res = await updateSocket.sendReserva(s[2]);
+          res = await updateSocket.sendReserva(ws.idCliente);
+          para = ws.idCliente;
+          break;
+        case 'id':
+          ws.idCliente = s[2];
+          res = "bienvendio " + s[2] 
+          para=ws.idCliente;
           break;
         default:
-          res="Comando"
+          res = "Comando"
           break;
       }
     } else {
       res = "server  say" + message
     }
     if (typeof res === 'string' || res instanceof String)
-    ws.send(res);
-    if (!privado)
-      sendAll(res, ws)
+      ws.send(res);
+    sendAll(res, ws, para)
   });
 
 });
@@ -182,15 +187,20 @@ io.on('close', function close() {
   clearInterval(interval);
 });
 
-function sendAll(message, yo) {
-  if (typeof message === 'string' || message instanceof String)
-  {
+function sendAll(message, yo, to) {
+  if (typeof message === 'string' || message instanceof String) {
     for (var i = 0; i < CLIENTS.length; i++) {
-      if (CLIENTS[i] != yo)
+      if (CLIENTS[i] != yo) {
+        if (to != null) {
+          if (CLIENTS[i].idCliente == to)
+            CLIENTS[i].send(message);
+          continue;
+        }
         CLIENTS[i].send(message);
+      }
     }
   }
-  
+
 }
 
 

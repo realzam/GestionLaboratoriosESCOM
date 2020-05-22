@@ -190,6 +190,7 @@ router.post('/reservaComputadora', async (req, res) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
         res.json({ message: "Reserva hecha",status:0 });
+        updateSocket.sendUpdateReserva(usuario);
         reservaContinue(type, hora, compu, lab, fin)
       }
       else
