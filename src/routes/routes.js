@@ -218,12 +218,25 @@ async function reservaContinue(type, hora, compu, lab, fin) {
   }
 }
 
-router.put('/cancelarReserva/:boleta', (req, res) => {
-  const { boleta } = req.params;
+router.put('/cancelarReserva/:usuario', async (req, res) => {
+  const { usuario } = req.params;
   const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
-  mysqlConnection.query(query, [boleta], (err, rows, fields) => {
+  var resp = await peticiones.miReserva(usuario);
+  var lab;
+  var hora;
+  if(resp.length>0)
+  {
+    lab=resp[0]['id_laboratorio'];
+    hora=resp[0]['hora'];
+  }
+  else{
+    res.json({ status: "No tienes reserva" });
+    return 0;
+  }
+  mysqlConnection.query(query, [usuario], (err, rows, fields) => {
     if (!err) {
-      updateSocket.sendUpdateReserva(boleta);
+      updateSocket.sendUpdateReserva(usuario);
+      updateSocket.sendUpdateComputadorasFuture(lab, hora);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
