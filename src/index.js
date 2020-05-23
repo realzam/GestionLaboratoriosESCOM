@@ -7,6 +7,7 @@ const utils = require('./utils.js');
 const peticiones = require('./peticiones.js');
 var request = require('request');
 const moment = require('moment');
+var momentzone = require('moment-timezone');
 const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
 
@@ -31,7 +32,7 @@ global.timersReserva = [];
 global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
 
-momento.setFecha(moment(moment().tz("America/Mexico_City").subtract(1,'day').format('YYYY-MM-DTHH:mm:ss.SSS')));
+momento.setFecha(moment(momentzone().tz("America/Mexico_City").subtract(1,'day').format('YYYY-MM-DTHH:mm:ss.SSS')));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
