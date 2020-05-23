@@ -31,7 +31,7 @@ global.timersReserva = [];
 global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
 
-//momento.setFecha(moment('2020-05-19T12:09:00'));
+momento.setFecha(moment('2020-05-21T12:22:00'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
@@ -170,15 +170,15 @@ io.on('connection', ws => {
           break;
         case 'id':
           ws.idCliente = s[2];
-          res = "bienvendio " + s[2] 
+          res = "bienvendio " + s[2];
           para=ws.idCliente;
           break;
         default:
-          res = "Comando"
+          res = "Comando";
           break;
       }
     } else {
-      res = "server  say" + message
+      res = "server  say" + message;
     }
     if (typeof res === 'string' || res instanceof String)
       ws.send(res);
