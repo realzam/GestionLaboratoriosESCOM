@@ -26,7 +26,6 @@ app.use(require('./routes/views'));
 //global varibles
 var timeOutReserva;
 var timeOutSheduling;
-global.dis = []
 global.labslist = [1105, 1106, 1107, 2103];
 global.timersReserva = [];
 global.reservaTime = 10;
@@ -35,6 +34,7 @@ global.reservaTimeType = 'minute';// second  minute
 //momento.setFecha(moment('2020-05-19T12:09:00'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
+
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
   var resp = await peticiones.getReservasEnEspera();
   for (const item of resp) {
@@ -45,6 +45,7 @@ const server = app.listen(app.get('port'), async () => {
   timerReserva(0);
   setInterval(interval2, 1000 * 60 * 5);
 });
+
 async function setHoraRoute() {
   clearTimeout(timeOutReserva);
   clearTimeout(timeOutSheduling);
@@ -55,41 +56,50 @@ async function setHoraRoute() {
   updateSocket.sendUpdateLabs();
 
 }
+
 async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
+  var dateS = await updateSocket.sendServerDate();
+  sendAll(dateS, null, null);
+  
   var hora;
   var dia = momento.momento().day();
   if (dia == 6 || dia == 0) {
     peticiones.setLaboratoriosEdo('No disponible', 0);
-    peticiones.setComputadorasEdo('Ocupada', 0);
+    await peticiones.setComputadorasEdo('Ocupada', 0);
   } else {
     hora = utils.getHoraID(momento.momento());
     if (hora == 3 || hora == 9) {
       peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
-      peticiones.setComputadorasEdo('Disponible', 0);
+      await peticiones.setComputadorasEdo('Disponible', 0);
     } else if (hora == 0) {
       peticiones.setLaboratoriosEdo('No disponible', 0);
-      peticiones.setComputadorasEdo('Ocupada', 0);
+      await peticiones.setComputadorasEdo('Ocupada', 0);
     }
     else {
-      for (var i = 0; i < global.labslist.length; i++) {
-        var edo = await peticiones.getLibreLaboratorio(labslist[i], hora, dia)
-        peticiones.modEdoLab(labslist[i], edo)
-        if (edo == "Tiempo libre") {
-          peticiones.setComputadorasEdo('Disponible', labslist[i]);
-        } else {
-          peticiones.setComputadorasEdo('Ocupada', labslist[i]);
-        }
-      }
+      await forLoop1(hora, dia)
     }
     peticiones.setComputadorasReservadas(dia, hora)
   }
   updateSocket.sendUpdateLabs();
-  var dateS = await updateSocket.sendServerDate();
-  sendAll(dateS, null, null);
   timeOutSheduling = setTimeout(() => { scheduling() }, utils.nextTimer(momento.momento()) - momento.momento())
 
 }
+
+
+const forLoop1 = async (hora, dia) => {
+  for (var i = 0; i < global.labslist.length; i++) {
+    var edo = await peticiones.getLibreLaboratorio(global.labslist[i], hora, dia)
+    peticiones.modEdoLab(global.labslist[i], edo)
+    if (edo == "Tiempo libre") {
+      await peticiones.setComputadorasEdo('Disponible', global.labslist[i]);
+    } else {
+      await peticiones.setComputadorasEdo('Ocupada', global.labslist[i]);
+    }
+  }
+  return new Promise(resolve => resolve(true));
+}
+
 async function timerReserva(opc) {
   clearTimeout(timeOutReserva)
   if (opc == 2) {
@@ -97,12 +107,11 @@ async function timerReserva(opc) {
     await peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
     global.timersReserva.shift();
     updateSocket.sendUpdateLabs();
+    var dateS = await updateSocket.sendServerDate();
+    sendAll(dateS, null, null);
     if (global.timersReserva.length == 0)
       utils.setTimersReservas()
   }
-  updateSocket.sendUpdateLabs();
-  var dateS = await updateSocket.sendServerDate();
-  sendAll(dateS, null, null);
   timeOutReserva = setTimeout(() => { timerReserva(2) }, global.timersReserva[0] - momento.momento());
 
 }
@@ -136,9 +145,9 @@ const io = new WebSocket.Server({ server });
 CLIENTS = [];
 
 io.on('connection', ws => {
-  ws.on('disconnect', function(){
+  ws.on('disconnect', function () {
     console.log('adios');
-    
+
   });
   CLIENTS.push(ws);
   console.log('cliente nuevo')
@@ -170,21 +179,21 @@ io.on('connection', ws => {
           para = ws.idCliente;
           break;
         case 'id':
-          var responseG={}
+          var responseG = {}
           ws.idCliente = s[2];
-          responseG['info']="bienvendio " + s[2];
-          res =JSON.stringify(responseG);
-          para=ws.idCliente;
+          responseG['info'] = "bienvendio " + s[2];
+          res = JSON.stringify(responseG);
+          para = ws.idCliente;
           break;
         default:
-          var responseG={}
-          responseG['info']="Comando";
-          res =JSON.stringify(responseG);
+          var responseG = {}
+          responseG['info'] = "Comando";
+          res = JSON.stringify(responseG);
           break;
       }
     } else {
-      var responseG={}
-      responseG['info']="server  say" + message;
+      var responseG = {}
+      responseG['info'] = "server  say" + message;
       res = JSON.stringify(responseG);
     }
     if (typeof res === 'string' || res instanceof String)
@@ -199,7 +208,7 @@ io.on('close', function close() {
   clearInterval(interval);
 });
 
-io.on('disconnect', function(){
+io.on('disconnect', function () {
   console.log('adios');
 });
 
@@ -208,22 +217,21 @@ io.once('disconnect', function () {
 });
 function isAliveClient() {
   console.log('================================')
- for (let i = 0; i < CLIENTS.length; ) {
-   console.log(i,CLIENTS.length)
-   if(CLIENTS[i].readyState==3)
-   {
-     console.log('eliminando de la lista')
-    CLIENTS.splice(i, 1);
-    continue;
-   }
-   i++
- }
+  for (let i = 0; i < CLIENTS.length;) {
+    console.log(i, CLIENTS.length)
+    if (CLIENTS[i].readyState == 3) {
+      console.log('eliminando de la lista')
+      CLIENTS.splice(i, 1);
+      continue;
+    }
+    i++
+  }
 }
 
 function sendAll(message, yo, to) {
   if (typeof message === 'string' || message instanceof String) {
     for (var i = 0; i < CLIENTS.length; i++) {
-      
+
       if (CLIENTS[i] != yo) {
         if (to != null) {
           if (CLIENTS[i].idCliente == to)

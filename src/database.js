@@ -35,6 +35,6 @@ mysqlConnection.query('USE bupvlgevftpcqhgzuwql');
 console.log('connected to the database');
 setInterval(function () {
   mysqlConnection.query('SELECT 1');
-}, 60000);
+}, 1000*60);
 
 module.exports = mysqlConnection;

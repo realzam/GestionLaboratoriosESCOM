@@ -11,6 +11,7 @@ const moment = require('moment');
 // GET
 
 router.get('/', async (req, res) => {
+  console.log('/route raiz')
   var labs = await peticiones.getLabsInfo()
   res.json(labs);
 });
@@ -162,8 +163,6 @@ router.put('/modifyToken/:id', (req, res) => {
 
 
 router.post('/reservaComputadora', async (req, res) => {
-
-
   const { usuario, compu, lab, hora } = req.body;
   var edo = "En espera"
   //const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
@@ -206,14 +205,12 @@ router.post('/reservaComputadora', async (req, res) => {
 
 function reservaContinue(type, hora, lab, fin,usuario) {
   if (type == 1) {
-    console.log('type',type);
     utils.addTimerReserva(fin);
     updateSocket.sendUpdateComputadoras(lab);
     updateSocket.sendUpdateLabs();
 
   } else
   {
-    console.log('type',type);
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
   updateSocket.sendUpdateReserva(usuario);
