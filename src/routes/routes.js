@@ -224,17 +224,21 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
   var resp = await peticiones.miReserva(usuario);
   var lab;
   var hora;
+  var compu;
   if(resp.length>0)
   {
     lab=resp[0]['id_laboratorio'];
     hora=resp[0]['hora'];
+    compu=resp[0]['id_computadora'];
   }
   else{
     res.json({ status: "No tienes reserva" });
     return 0;
   }
-  mysqlConnection.query(query, [usuario], (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario],async (err, rows, fields) => {
     if (!err) {
+      if(utils.getHoraID(momento.momento())==hora)
+       await peticiones.modCompu(compu, lab, 'Disponible')
       updateSocket.sendUpdateReserva(usuario);
       updateSocket.sendUpdateComputadorasFuture(lab, hora);
       res.json({ status: "Reserva cancelada" });
