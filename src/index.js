@@ -170,16 +170,22 @@ io.on('connection', ws => {
           para = ws.idCliente;
           break;
         case 'id':
+          var responseG={}
           ws.idCliente = s[2];
-          res = "bienvendio " + s[2];
+          responseG['info']="bienvendio " + s[2];
+          res =JSON.stringify(responseG);
           para=ws.idCliente;
           break;
         default:
-          res = "Comando";
+          var responseG={}
+          responseG['info']="Comando";
+          res =JSON.stringify(responseG);
           break;
       }
     } else {
-      res = "server  say" + message;
+      var responseG={}
+      responseG['info']="server  say" + message;
+      res = JSON.stringify(responseG);
     }
     if (typeof res === 'string' || res instanceof String)
       ws.send(res);
