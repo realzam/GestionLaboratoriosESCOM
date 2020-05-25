@@ -186,12 +186,13 @@ router.post('/reservaComputadora', async (req, res) => {
     return 0
   }
 
-  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], async(err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
-        updateSocket.sendUpdateReserva(usuario);
-        reservaContinue(type, hora, compu, lab, fin)
-        res.json({ message: "Reserva hecha",status:0 });
+        if (type == 1)
+          await peticiones.modCompu(compu, lab, 'Reservada');
+        reservaContinue(type, hora, compu, lab, fin,usuario)
+        res.json({ message: "Reserva hecha",status:0 ,type:type});
       }
       else
         res.json({ message: "Computadora no disponible",status:1});
@@ -203,19 +204,19 @@ router.post('/reservaComputadora', async (req, res) => {
   });
 });
 
-async function reservaContinue(type, hora, compu, lab, fin) {
+function reservaContinue(type, hora, lab, fin,usuario) {
   if (type == 1) {
-    console.log('type',type)
-    utils.addTimerReserva(fin)
-    await peticiones.modCompu(compu, lab, 'Reservada')
-    updateSocket.sendUpdateLabs();
+    console.log('type',type);
+    utils.addTimerReserva(fin);
     updateSocket.sendUpdateComputadoras(lab);
+    updateSocket.sendUpdateLabs();
 
   } else
   {
-    console.log('type',type)
+    console.log('type',type);
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
+  updateSocket.sendUpdateReserva(usuario);
 }
 
 router.put('/cancelarReserva/:usuario', async (req, res) => {
@@ -238,9 +239,13 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario],async (err, rows, fields) => {
     if (!err) {
       if(utils.getHoraID(momento.momento())==hora)
-       await peticiones.modCompu(compu, lab, 'Disponible')
-      updateSocket.sendUpdateReserva(usuario);
+      {
+        await peticiones.modCompu(compu, lab, 'Disponible')
+        updateSocket.sendUpdateComputadoras(lab);
+      }else
       updateSocket.sendUpdateComputadorasFuture(lab, hora);
+      
+      updateSocket.sendUpdateReserva(usuario);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
