@@ -4,8 +4,10 @@ const mysqlConnection = require('./database.js');
 const updateSocket = require('./sendUpdateSockets.js');
 function Labs() {
   return new Promise(async function (resolve, reject) {
-    var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
-    mysqlConnection.query(sql, (err, rows, fields) => {
+    //var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
+    var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="LIBRE" group by l.idLaboratorio'
+   var dia=momento.momento().day();
+    mysqlConnection.query(sql,[dia], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -36,7 +38,7 @@ function getLabs() {
     var responseG = {}
     responseG['comando'] = '/labs';
     responseG['ok'] = true;
-    responseG['info'] = await getLabsInfo();
+    responseG['info'] = await Labs();
     resolve(JSON.stringify(responseG))
   });
 }

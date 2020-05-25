@@ -262,4 +262,104 @@ router.post('/hora', async (req, res) => {
   res.json({ fecha: momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS') });
 });
 
+router.get('/horario', async (req, res) => {
+  var { lab, dia, hora,clase } = req.body;
+  var params=[];
+  
+  var respnse=[];
+
+  console.table({
+    lab:lab,
+    dia:dia,
+    hora:hora,
+    clase:clase
+  })
+  var sql='select h.idHorario,h.dia,h.hora,hr.inicio,hr.fin,h.clase from Horario h,Hora hr where ';
+  if(lab!=null)
+  {
+    sql=sql+'idHorario=?';
+    params.push(lab);
+  }else
+  {
+    sql=sql+'1=1';
+  }
+  
+  console.log('dia if',dia>=1 && dia<=5);
+  if( dia == 6 || dia == 0)
+  {
+    dia=1;
+    sql=sql+' and dia=?';
+    params.push(dia);
+  }else if(dia>=1 && dia<=5)
+  {
+    sql=sql+' and dia=?';
+    console.log('sql add dia');
+    
+    params.push(dia);
+  }
+
+  if(hora==null || hora==0||hora ==-1)
+  {
+    hora=utils.getHoraID(momento.momento());
+    if(hora==0||hora ==-1)
+    hora=1;
+    sql=sql+' and hora=?';
+    params.push(hora);
+  }
+  else if(hora>=1 && hora<=11)
+  {
+    sql=sql+' and hora=?';
+    params.push(hora);
+  }
+  if(clase!=null)
+  {
+    sql=sql+' and clase=?';
+    params.push(clase);
+  }
+  sql=sql+' order by h.idHorario,h.dia,h.hora';
+  console.log('sql',sql);
+  console.table({
+    lab:lab,
+    dia:dia,
+    hora:hora,
+    clase:clase
+  })
+  var resp= await horario(sql,params);
+  if(!resp['ok'])
+  {
+    res.json(resp['info'])
+    return 0;
+  }
+  else{
+ var claseO={};
+ var claseList=[]
+    for (let i = 0; i < resp['info'].length; i++) {
+      var element=resp['info'][0];
+      claseO['clase']=element['clase'];
+      claseO['inicio']=element['inicio'];
+      claseO['fin']=element['fin'];
+      claseList.push(Object.assign({}, claseO))
+      
+  }
+  respnse['clase']=claseList;
+  console.log('claseList',claseList)
+  res.json(respnse);
+}
+});
+
+function horario(sql,params) {
+  return new Promise(function (resolve, reject) {
+    mysqlConnection.query(sql, params, (err, rows, fields) => {
+      if(!err){
+        resolve({ok:true,info:rows})
+      }
+      else
+      {
+        console.log(err)
+        resolve({ok:false,info:"hay un error"})
+      }
+    });
+  });
+}
+
 module.exports = router;
