@@ -189,9 +189,9 @@ router.post('/reservaComputadora', async (req, res) => {
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
-        res.json({ message: "Reserva hecha",status:0 });
         updateSocket.sendUpdateReserva(usuario);
         reservaContinue(type, hora, compu, lab, fin)
+        res.json({ message: "Reserva hecha",status:0 });
       }
       else
         res.json({ message: "Computadora no disponible",status:1});
