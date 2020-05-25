@@ -239,6 +239,7 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
       {
         await peticiones.modCompu(compu, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
+        updateSocket.sendUpdateLabs();
       }else
       updateSocket.sendUpdateComputadorasFuture(lab, hora);
       
