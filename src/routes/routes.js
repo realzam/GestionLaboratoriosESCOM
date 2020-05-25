@@ -191,7 +191,7 @@ router.post('/reservaComputadora', async (req, res) => {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
           await peticiones.modCompu(compu, lab, 'Reservada');
-        reservaContinue(type, hora, compu, lab, fin,usuario)
+        reservaContinue(type, hora,lab, fin,usuario)
         res.json({ message: "Reserva hecha",status:0 ,type:type});
       }
       else
