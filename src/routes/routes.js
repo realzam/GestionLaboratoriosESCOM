@@ -262,11 +262,11 @@ router.post('/hora', async (req, res) => {
   res.json({ fecha: momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS') });
 });
 
-router.get('/horario', async (req, res) => {
+router.post('/horario', async (req, res) => {
   var { lab, dia, hora,clase } = req.body;
   var params=[];
   
-  var respnse=[];
+  var respnse={};
 
   console.table({
     lab:lab,
@@ -298,7 +298,7 @@ router.get('/horario', async (req, res) => {
     params.push(dia);
   }
 
-  if(hora==null || hora==0||hora ==-1)
+  if(hora==0||hora ==-1)
   {
     hora=utils.getHoraID(momento.momento());
     if(hora==0||hora ==-1)
@@ -311,12 +311,13 @@ router.get('/horario', async (req, res) => {
     sql=sql+' and hora=?';
     params.push(hora);
   }
+
   if(clase!=null)
   {
     sql=sql+' and clase=?';
     params.push(clase);
   }
-  sql=sql+' order by h.idHorario,h.dia,h.hora';
+  sql=sql+' and hr.idHora=h.hora order by h.idHorario,h.dia,h.hora';
   console.log('sql',sql);
   console.table({
     lab:lab,
@@ -332,17 +333,52 @@ router.get('/horario', async (req, res) => {
   }
   else{
  var claseO={};
- var claseList=[]
+ var claseList=[];
+
+ var diaList=[];
+ var diaO={};
+var diaAux=resp['info'][0]['dia'];
+
+var labList=[];
+var labO={};
+var labAux=resp['info'][0]['idHorario'];
     for (let i = 0; i < resp['info'].length; i++) {
-      var element=resp['info'][0];
+      var element=resp['info'][i];
+      if(resp['info'].length==1)
+      {
+        claseO['clase']=element['clase'];
+        claseO['hora']=element['hora'];
+        claseO['inicio']=element['inicio'];
+        claseO['fin']=element['fin'];
+        claseList.push(Object.assign({}, claseO))
+      }
+      if(diaAux!= element['dia'] || i==resp['info'].length-1||labAux!=element['idHorario'])
+      {
+        console.log('i',i);
+        diaO['dia']=diaAux;
+        diaO['clases']=claseList;
+        claseList=[];
+        diaList.push(Object.assign({}, diaO))
+        diaAux= element['dia']
+
+        if(labAux!=element['idHorario']|| i==resp['info'].length-1)
+      {
+        labO['id_laboratorio']=labAux;
+        labO['dias']=diaList; 
+        diaList=[];
+        labList.push(Object.assign({}, labO))
+        labAux=element['idHorario'];
+      }
+      }
       claseO['clase']=element['clase'];
+      claseO['hora']=element['hora'];
       claseO['inicio']=element['inicio'];
       claseO['fin']=element['fin'];
       claseList.push(Object.assign({}, claseO))
-      
   }
-  respnse['clase']=claseList;
-  console.log('claseList',claseList)
+  respnse['lab']=labList;
+  //console.log('respnse',respnse);
+  
   res.json(respnse);
 }
 });
