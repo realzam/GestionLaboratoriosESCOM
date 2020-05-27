@@ -179,38 +179,36 @@ router.post('/reservaComputadora', async (req, res) => {
     type = 2;
   }
   var resp = await peticiones.miReserva(usuario);
-  if(resp.length>0)
-  {
-    res.json({ message: "Ya tienes un reserva",status:2 });
+  if (resp.length > 0) {
+    res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
 
-  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], async(err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
           await peticiones.modCompu(compu, lab, 'Reservada');
-        reservaContinue(type, hora,lab, fin,usuario)
-        res.json({ message: "Reserva hecha",status:0 ,type:type});
+        reservaContinue(type, hora, lab, fin, usuario)
+        res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
-        res.json({ message: "Computadora no disponible",status:1});
+        res.json({ message: "Computadora no disponible", status: 1 });
 
     } else {
       console.log(err);
-      res.json({ message: "Ups hubo un error",status:2 });
+      res.json({ message: "Ups hubo un error", status: 2 });
     }
   });
 });
 
-function reservaContinue(type, hora, lab, fin,usuario) {
+function reservaContinue(type, hora, lab, fin, usuario) {
   if (type == 1) {
     utils.addTimerReserva(fin);
     updateSocket.sendUpdateComputadoras(lab);
     updateSocket.sendUpdateLabs();
 
-  } else
-  {
+  } else {
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
   updateSocket.sendUpdateReserva(usuario);
@@ -223,26 +221,24 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
   var lab;
   var hora;
   var compu;
-  if(resp.length>0)
-  {
-    lab=resp[0]['id_laboratorio'];
-    hora=resp[0]['hora'];
-    compu=resp[0]['id_computadora'];
+  if (resp.length > 0) {
+    lab = resp[0]['id_laboratorio'];
+    hora = resp[0]['hora'];
+    compu = resp[0]['id_computadora'];
   }
-  else{
+  else {
     res.json({ status: "No tienes reserva" });
     return 0;
   }
-  mysqlConnection.query(query, [usuario],async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
     if (!err) {
-      if(utils.getHoraID(momento.momento())==hora)
-      {
+      if (utils.getHoraID(momento.momento()) == hora) {
         await peticiones.modCompu(compu, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
-      }else
-      updateSocket.sendUpdateComputadorasFuture(lab, hora);
-      
+      } else
+        updateSocket.sendUpdateComputadorasFuture(lab, hora);
+
       updateSocket.sendUpdateReserva(usuario);
       res.json({ status: "Reserva cancelada" });
     } else {
@@ -263,136 +259,103 @@ router.post('/hora', async (req, res) => {
 });
 
 router.post('/horario', async (req, res) => {
-  var { lab, dia, hora,clase } = req.body;
-  var params=[];
-  
-  var respnse={};
+  var { lab, dia, hora, clase } = req.body;
+  var params = [];
 
-  console.table({
-    lab:lab,
-    dia:dia,
-    hora:hora,
-    clase:clase
-  })
-  var sql='select h.idHorario,h.dia,h.hora,hr.inicio,hr.fin,h.clase from Horario h,Hora hr where ';
-  if(lab!=null)
-  {
-    sql=sql+'idHorario=?';
+  var respnse = {};
+  var sql = 'select h.idHorario,h.dia,h.hora,hr.inicio,hr.fin,h.clase from Horario h,Hora hr where ';
+  if (lab != null) {
+    sql = sql + 'idHorario=?';
     params.push(lab);
-  }else
-  {
-    sql=sql+'1=1';
+  } else {
+    sql = sql + '1=1';
   }
-  
-  console.log('dia if',dia>=1 && dia<=5);
-  if( dia == 6 || dia == 0)
-  {
-    dia=1;
-    sql=sql+' and dia=?';
+  if (dia == 6 || dia == 0) {
+    dia = 1;
+    sql = sql + ' and dia=?';
     params.push(dia);
-  }else if(dia>=1 && dia<=5)
-  {
-    sql=sql+' and dia=?';
-    console.log('sql add dia');
-    
+  } else if (dia >= 1 && dia <= 5) {
+    sql = sql + ' and dia=?';
     params.push(dia);
   }
 
-  if(hora==0||hora ==-1)
-  {
-    hora=utils.getHoraID(momento.momento());
-    if(hora==0||hora ==-1)
-    hora=1;
-    sql=sql+' and hora=?';
+  if (hora == 0 || hora == -1) {
+    hora = utils.getHoraID(momento.momento());
+    if (hora == 0 || hora == -1)
+      hora = 1;
+    sql = sql + ' and hora=?';
     params.push(hora);
   }
-  else if(hora>=1 && hora<=11)
-  {
-    sql=sql+' and hora=?';
+  else if (hora >= 1 && hora <= 11) {
+    sql = sql + ' and hora=?';
     params.push(hora);
   }
 
-  if(clase!=null)
-  {
-    sql=sql+' and clase=?';
+  if (clase != null) {
+    sql = sql + ' and clase=?';
     params.push(clase);
   }
-  sql=sql+' and hr.idHora=h.hora order by h.idHorario,h.dia,h.hora';
-  console.log('sql',sql);
-  console.table({
-    lab:lab,
-    dia:dia,
-    hora:hora,
-    clase:clase
-  })
-  var resp= await horario(sql,params);
-  if(!resp['ok'])
-  {
+  sql = sql + ' and hr.idHora=h.hora order by h.idHorario,h.dia,h.hora';
+  var resp = await horario(sql, params);
+  if (!resp['ok'] || resp['info'].length == 0) {
     res.json(resp['info'])
     return 0;
   }
-  else{
- var claseO={};
- var claseList=[];
-
- var diaList=[];
- var diaO={};
-var diaAux=resp['info'][0]['dia'];
-
-var labList=[];
-var labO={};
-var labAux=resp['info'][0]['idHorario'];
+  else {
+    var claseO = {};
+    var claseList = [];
+    var diaList = [];
+    var diaO = {};
+    var diaAux = resp['info'][0]['dia'];
+    var labList = [];
+    var labO = {};
+    var labAux = resp['info'][0]['idHorario'];
     for (let i = 0; i < resp['info'].length; i++) {
-      var element=resp['info'][i];
-      if(resp['info'].length==1)
-      {
-        claseO['clase']=element['clase'];
-        claseO['hora']=element['hora'];
-        claseO['inicio']=element['inicio'];
-        claseO['fin']=element['fin'];
+      var element = resp['info'][i];
+      if (resp['info'].length == 1) {
+        claseO['clase'] = element['clase'];
+        claseO['hora'] = element['hora'];
+        claseO['inicio'] = element['inicio'];
+        claseO['fin'] = element['fin'];
         claseList.push(Object.assign({}, claseO))
       }
-      if(diaAux!= element['dia'] || i==resp['info'].length-1||labAux!=element['idHorario'])
-      {
-        console.log('i',i);
-        diaO['dia']=diaAux;
-        diaO['clases']=claseList;
-        claseList=[];
+      if (diaAux != element['dia'] || i == resp['info'].length - 1 || labAux != element['idHorario']) {
+        diaO['dia'] = diaAux;
+        diaO['clases'] = claseList;
+        claseList = [];
         diaList.push(Object.assign({}, diaO))
-        diaAux= element['dia']
+        diaAux = element['dia']
 
-        if(labAux!=element['idHorario']|| i==resp['info'].length-1)
-      {
-        labO['id_laboratorio']=labAux;
-        labO['dias']=diaList; 
-        diaList=[];
-        labList.push(Object.assign({}, labO))
-        labAux=element['idHorario'];
+        if (labAux != element['idHorario'] || i == resp['info'].length - 1) {
+          labO['id_laboratorio'] = labAux;
+          labO['dias'] = diaList;
+          diaList = [];
+          labList.push(Object.assign({}, labO))
+          labAux = element['idHorario'];
+        }
       }
-      }
-      claseO['clase']=element['clase'];
-      claseO['hora']=element['hora'];
-      claseO['inicio']=element['inicio'];
-      claseO['fin']=element['fin'];
+      claseO['clase'] = element['clase'];
+      claseO['hora'] = element['hora'];
+      claseO['inicio'] = element['inicio'];
+      claseO['fin'] = element['fin'];
       claseList.push(Object.assign({}, claseO))
+    }
+    respnse['lab'] = labList;
+    //console.log('respnse',respnse);
+
+    res.json(respnse);
   }
-  respnse['lab']=labList;
-  //console.log('respnse',respnse);
-  
-  res.json(respnse);
-}
 });
 
-function horario(sql,params) {
+function horario(sql, params) {
   return new Promise(function (resolve, reject) {
     mysqlConnection.query(sql, params, (err, rows, fields) => {
-      if(!err){
-        resolve({ok:true,info:rows})
+      if (!err) {
+        resolve({ ok: true, info: rows })
       }
-      else
-      {
+      else {
         console.log(err)
-        resolve({ok:false,info:"hay un error"})
+        resolve({ ok: false, info: "hay un error" })
       }
     });
   });

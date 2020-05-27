@@ -72,7 +72,7 @@ async function scheduling() {
     if (hora == 3 || hora == 9) {
       peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
       await peticiones.setComputadorasEdo('Disponible', 0);
-    } else if (hora == 0) {
+    } else if (hora == 0 || hora == -1) {
       peticiones.setLaboratoriosEdo('No disponible', 0);
       await peticiones.setComputadorasEdo('Ocupada', 0);
     }
