@@ -302,6 +302,7 @@ router.post('/horario', async (req, res) => {
     return 0;
   }
   else {
+    respnse['ok']=true;
     var claseO = {};
     var claseList = [];
     var diaList = [];
