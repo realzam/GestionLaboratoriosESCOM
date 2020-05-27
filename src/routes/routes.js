@@ -298,7 +298,7 @@ router.post('/horario', async (req, res) => {
   sql = sql + ' and hr.idHora=h.hora order by h.idHorario,h.dia,h.hora';
   var resp = await horario(sql, params);
   if (!resp['ok'] || resp['info'].length == 0) {
-    res.json(resp['info'])
+    res.json(resp)
     return 0;
   }
   else {
