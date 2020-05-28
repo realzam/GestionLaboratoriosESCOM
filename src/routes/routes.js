@@ -313,33 +313,46 @@ router.post('/horario', async (req, res) => {
     var labAux = resp['info'][0]['idHorario'];
     for (let i = 0; i < resp['info'].length; i++) {
       var element = resp['info'][i];
-      if (resp['info'].length == 1) {
+      if(i == resp['info'].length - 1)
+      {
         claseO['clase'] = element['clase'];
         claseO['hora'] = element['hora'];
         claseO['inicio'] = element['inicio'];
         claseO['fin'] = element['fin'];
         claseList.push(Object.assign({}, claseO))
-      }
-      if (diaAux != element['dia'] || i == resp['info'].length - 1 || labAux != element['idHorario']) {
         diaO['dia'] = diaAux;
         diaO['clases'] = claseList;
         claseList = [];
         diaList.push(Object.assign({}, diaO))
         diaAux = element['dia']
+        labO['id_laboratorio'] = labAux;
+        labO['dias'] = diaList;
+        diaList = [];
+        labList.push(Object.assign({}, labO))
+        labAux = element['idHorario'];
+      }
 
-        if (labAux != element['idHorario'] || i == resp['info'].length - 1) {
-          labO['id_laboratorio'] = labAux;
-          labO['dias'] = diaList;
-          diaList = [];
-          labList.push(Object.assign({}, labO))
-          labAux = element['idHorario'];
-        }
+      if (labAux != element['idHorario']) {
+       
+        labO['id_laboratorio'] = labAux;
+        labO['dias'] = diaList;
+        diaList = [];
+        labList.push(Object.assign({}, labO))
+        labAux = element['idHorario'];
+      }else if(diaAux != element['dia'])
+      {
+        diaO['dia'] = diaAux;
+        diaO['clases'] = claseList;
+        claseList = [];
+        diaList.push(Object.assign({}, diaO))
+        diaAux = element['dia']
       }
       claseO['clase'] = element['clase'];
       claseO['hora'] = element['hora'];
       claseO['inicio'] = element['inicio'];
       claseO['fin'] = element['fin'];
       claseList.push(Object.assign({}, claseO))
+      
     }
     respnse['lab'] = labList;
     //console.log('respnse',respnse);
