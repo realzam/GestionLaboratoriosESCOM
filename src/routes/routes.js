@@ -259,6 +259,7 @@ router.post('/hora', async (req, res) => {
 });
 
 router.post('/horario', async (req, res) => {
+  console.log('/horario')
   var { lab, dia, hora, clase } = req.body;
   var params = [];
 
@@ -302,7 +303,7 @@ router.post('/horario', async (req, res) => {
     return 0;
   }
   else {
-    respnse['ok']=true;
+    respnse['ok'] = true;
     var claseO = {};
     var claseList = [];
     var diaList = [];
@@ -313,8 +314,7 @@ router.post('/horario', async (req, res) => {
     var labAux = resp['info'][0]['idHorario'];
     for (let i = 0; i < resp['info'].length; i++) {
       var element = resp['info'][i];
-      if(i == resp['info'].length - 1)
-      {
+      if (i == resp['info'].length - 1) {
         claseO['clase'] = element['clase'];
         claseO['hora'] = element['hora'];
         claseO['inicio'] = element['inicio'];
@@ -331,16 +331,20 @@ router.post('/horario', async (req, res) => {
         labList.push(Object.assign({}, labO))
         labAux = element['idHorario'];
       }
-
       if (labAux != element['idHorario']) {
-       
+        if (diaList == 0) {
+          diaO['dia'] = diaAux;
+          diaO['clases'] = claseList;
+          claseList = [];
+          diaList.push(Object.assign({}, diaO))
+          diaAux = element['dia']
+        }
         labO['id_laboratorio'] = labAux;
         labO['dias'] = diaList;
         diaList = [];
         labList.push(Object.assign({}, labO))
         labAux = element['idHorario'];
-      }else if(diaAux != element['dia'])
-      {
+      } else if (diaAux != element['dia']) {
         diaO['dia'] = diaAux;
         diaO['clases'] = claseList;
         claseList = [];
@@ -352,7 +356,6 @@ router.post('/horario', async (req, res) => {
       claseO['inicio'] = element['inicio'];
       claseO['fin'] = element['fin'];
       claseList.push(Object.assign({}, claseO))
-      
     }
     respnse['lab'] = labList;
     //console.log('respnse',respnse);
