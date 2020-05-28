@@ -34,6 +34,7 @@ async function sendUpdateComputadorasFuture(lab,hora)
     responseG['comando']="/infoS"
     responseG['fecha_servidor']=momento.momento().format('YYYY-MM-DD HH:mm:ss');
     responseG['hora_id']=utils.getHoraID(momento.momento())
+    responseG['dia']= momento.momento().day();
     var res=JSON.stringify(responseG);
     resolve(res)
   });
