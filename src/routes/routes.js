@@ -231,7 +231,7 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
     return 0;
   }
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
-    if (!err) {
+   if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
         await peticiones.modCompu(compu, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
@@ -244,7 +244,7 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
     } else {
       console.log(err);
     }
-  });
+  }); 
 });
 
 router.post('/hora', async (req, res) => {
@@ -256,6 +256,19 @@ router.post('/hora', async (req, res) => {
     momento.setFecha(moment(fecha + 'T' + hora));
   index.setHoraRoute();
   res.json({ fecha: momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS') });
+});
+router.post('/tokenNotification', async (req, res) => {
+  const { token, usuario } = req.body;//2020-05-19T12:09:00
+  var query='INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ?) LIMIT 1';
+  mysqlConnection.query(query, [token, usuario,token], async (err, rows, fields) => {
+    if (!err) {
+      res.json({ status: true });
+       
+     } else {
+       console.log(err);
+       res.json({ status: false });
+     }
+   }); 
 });
 
 router.post('/horario', async (req, res) => {
