@@ -5,7 +5,7 @@ const updateSocket = require('./sendUpdateSockets.js');
 function Labs() {
   return new Promise(async function (resolve, reject) {
     //var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
-   var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="LIBRE" group by l.idLaboratorio'
+   var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="Tiempo Libre" group by l.idLaboratorio'
    var dia=momento.momento().day();
    if (dia == 6 || dia == 0) {
      dia=1;
