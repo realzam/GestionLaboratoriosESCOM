@@ -117,14 +117,14 @@ router.post('/login', async (req, res) => {
   const { id, password } = req.body;
   console.log('login');
 
-  mysqlConnection.query('SELECT password FROM Usuario where id=?', [id, password], async (err, rows, fields) => {
+  mysqlConnection.query('SELECT password,tipoUsuario FROM Usuario where id=?', [id, password], async (err, rows, fields) => {
     if (rows.length < 1) {
       res.json({ error: "Usuario o Contraseña incorrecta" });
     } if (!err) {
       //console.log('rows',rows[0]['password'])
       const validPass = await helpers.matchPassword(password, rows[0]['password']);
       if (validPass)
-        res.json({ status: "ok" });
+        res.json({ status: "ok",type: rows[0]['tipoUsuario']});
       else
         res.json({ error: "Usuario o Contraseña incorrecta" });
     } else {
