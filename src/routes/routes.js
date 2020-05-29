@@ -68,12 +68,11 @@ router.delete('/:id', (req, res) => {
 //1 alumno
 //2 docente
 //3 adminsitrador
-router.post('/add/alumno', async (req, res) => {
+router.post('/add/usuario/:type', async (req, res) => {
+  const { type } = req.params;
   console.log(" add alumno");
   const { id, correo, password,nombre } = req.body;
-
   var finalpass = await helpers.encryptPassword(password);
-
   const query = "select correo from Usuario where correo=?";
   const query2 = "select id from Usuario where id=?";
   const query3 = "insert into  Usuario (id,correo,tipoUsuario,password,nombre) values (?,?,?,?,?)";
@@ -86,11 +85,11 @@ router.post('/add/alumno', async (req, res) => {
 
       mysqlConnection.query(query2, [id], (err2, rows2, fields2) => {
         if (rows2.length > 0) {
-          console.log("la boleta ya  esta en registrada");
-          res.json({ error: "la boleta ya  esta registrada" });
+          console.log("el usuario ya  estaba registrado");
+          res.json({ error: "el usuario ya  estaba registrado" });
         } else if (!err2) {
 
-          mysqlConnection.query(query3, [id, correo, 1, finalpass,nombre], (err3, rows3, fields3) => {
+          mysqlConnection.query(query3, [id, correo, type, finalpass,nombre], (err3, rows3, fields3) => {
             if (!err3) {
               console.log("Usuario guardado");
               res.json({ status: "Usuario guardado" });
