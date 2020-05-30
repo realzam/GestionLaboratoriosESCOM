@@ -31,7 +31,7 @@ global.timersReserva = [];
 global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
 
-momento.setFecha(moment().subtract(1,'day'));
+momento.setFecha(momento.momento().subtract(1,'day'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
 
