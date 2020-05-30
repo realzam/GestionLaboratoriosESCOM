@@ -31,7 +31,7 @@ global.timersReserva = [];
 global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
 
-momento.setFecha(moment('2020-05-29T11:57:00'));
+momento.setFecha(moment().subtract(1,'day'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
 

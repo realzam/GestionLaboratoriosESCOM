@@ -10,7 +10,6 @@ function Labs() {
    if (dia == 6 || dia == 0) {
      dia=1;
    }
-   
     mysqlConnection.query(sql,[dia], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
@@ -19,12 +18,6 @@ function Labs() {
       }
     });
   });
-}
-
-async function getLabsInfo() {
-var lab=await Labs();
-await forLoop1(lab);
-return lab
 }
 
 const forLoop1 = async (lab) => {
@@ -353,7 +346,7 @@ function miReserva(boleta) {
 
 module.exports.getLabs = getLabs;
 module.exports.getLibreLaboratorio = getLibreLaboratorio;
-module.exports.getLabsInfo = getLabsInfo;
+module.exports.Labs=Labs;
 module.exports.getComputadoras = getComputadoras;
 module.exports.getComputadorasFuture = getComputadorasFuture;
 module.exports.getHorasLibres = getHorasLibres;

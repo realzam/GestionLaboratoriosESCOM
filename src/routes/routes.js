@@ -12,7 +12,7 @@ const moment = require('moment');
 
 router.get('/', async (req, res) => {
   console.log('/route raiz')
-  var labs = await peticiones.getLabsInfo()
+  var labs = await peticiones.Labs();
   res.json(labs);
 });
 
