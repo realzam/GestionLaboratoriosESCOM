@@ -44,7 +44,7 @@ function getHorasLibres(lab, dia) {
   return new Promise(function (resolve, reject) {
     var res;
     var lista = [];
-    mysqlConnection.query('select hora from Horario where idHorario=? and dia=? and clase=?', [lab, dia, "LIBRE"], (err, rows, fields) => {
+    mysqlConnection.query('select hora from Horario where idHorario=? and dia=? and clase=?', [lab, dia, "Tiempo Libre"], (err, rows, fields) => {
       if (!err) {
         res = rows;
       } else {
@@ -164,8 +164,7 @@ function getLibreLaboratorio(lab, hora, dia) {
   return new Promise(function (resolve, reject) {
     mysqlConnection.query('select clase from Horario where idHorario= ? and hora= ? and dia= ?', [lab, hora, dia], (err, rows, fields) => {
       if (!err) {
-
-        if (rows[0]['clase'] == "LIBRE") {
+        if (rows[0]['clase'] == 'Tiempo Libre') {
           resolve('Tiempo libre');
 
         } else {
