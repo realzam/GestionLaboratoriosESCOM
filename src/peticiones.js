@@ -329,7 +329,6 @@ function getComputadorasFuture(lab, hora) {
     
     if(res.length==1)
     {
-      console.log('hay lab resrva')
       res=await forLoop2();
       //console.log(res)
     }else{

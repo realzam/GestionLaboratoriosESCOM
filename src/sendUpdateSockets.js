@@ -24,7 +24,6 @@ async function sendUpdateComputadorasFuture(lab,hora)
 {
   var res= await peticiones.getComputadorasFuture(lab,hora);
   index.sendAll(res,null,null);
-  console.log('send future 2');
 }
 
  function sendServerDate()
@@ -45,9 +44,22 @@ async function sendUpdateComputadorasFuture(lab,hora)
   return new Promise( async function (resolve) {
     responseG={};
     responseG['comando']="/miReserva"
+    var reservas=[];
     var info=await peticiones.miReserva(boleta);
+    var info2=await peticiones.miReserva2(boleta);
     if(info.length>0)
-    responseG['info']=info[0];
+    {
+      info[0].tipo=1;
+      reservas.push(info[0]);
+    }
+    if(info2.length>0)
+    {
+      info2[0].tipo=2;
+      reservas.push(info2[0]);
+    }
+    
+    if(reservas.length>0)
+    responseG['info']=reservas;
     else
     responseG['status']=false;
 

@@ -80,6 +80,25 @@ CREATE TABLE ReservaComputadora (
    PRIMARY KEY(idUsuario,idComputadora,idLaboratorio,inicio)
 );
 
+CREATE TABLE ReservaLaboratorio (
+  idUsuario INT NOT NULL,
+  idLaboratorio INT NOT NULL,
+  inicio DATETIME,
+  dia int,
+  hora int,
+  fin DATETIME,
+  estado VARCHAR(60) ,
+  foreign key(idUsuario) references Usuario(id)
+  on delete cascade on update cascade,
+  foreign key(idLaboratorio) references Laboratorio(idLaboratorio)
+  on delete cascade on update cascade,
+  foreign key(dia) references Dia(idDia)
+  on delete cascade on update cascade,
+  foreign key(hora) references Hora(idHora)
+  on delete cascade on update cascade,
+   PRIMARY KEY(idUsuario,idLaboratorio,inicio)
+)
+
 insert into Dia() values(1,'lunes');
 insert into Dia() values(2,'martes');
 insert into Dia() values(3,'miercoles');
