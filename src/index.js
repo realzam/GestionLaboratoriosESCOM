@@ -30,20 +30,18 @@ global.labslist = [1105, 1106, 1107, 2103];
 global.timersReserva = [];
 global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
-
-momento.setFecha(momento.momento().subtract(1,'day'));
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
 
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
-  var resp = await peticiones.getReservasEnEspera();
+/*  var resp = await peticiones.getReservasEnEspera();
   for (const item of resp) {
     global.timersReserva.push(moment(item['fin']));
   }
   global.timersReserva.sort();
   scheduling();
   timerReserva(0);
-  setInterval(interval2, 1000 * 60 * 5);
+  setInterval(interval2, 1000 * 60 * 5);*/
 });
 
 async function setHoraRoute() {
