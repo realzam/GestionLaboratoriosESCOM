@@ -201,6 +201,50 @@ router.post('/reservaComputadora', async (req, res) => {
   });
 });
 
+router.post('/reservaLaboratorio', async (req, res) => {
+  const { usuario, lab, hora } = req.body;
+  var edo = "En espera"
+  //const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
+  const query = "INSERT INTO ReservaLaboratorio () SELECT * FROM (SELECT ?,?,?,? AS dia,? As hora,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
+  var inicio = momento.momento();
+  var formato = 'YYYY-MM-DD HH:mm:ss';
+  var dia = momento.momento().day()
+  var type;
+  if (utils.compareDate(inicio, utils.getDateFromID(hora)) == inicio) {
+    var fin = inicio.clone().add(global.reservaTime, global.reservaTimeType);
+    type = 1;
+  } else {
+    var fin = utils.getDateFromID(hora).add(global.reservaTime, global.reservaTimeType);
+    type = 2;
+  }
+  var resp = await peticiones.miReserva2(usuario);
+  if (resp.length > 0) {
+    res.json({ message: "Ya tienes un reserva", status: 2 });
+    return 0
+  }
+
+  mysqlConnection.query(query, [usuario,  lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
+    if (!err) {
+      if (rows['affectedRows'] == 1) {
+        if (type == 1)
+        {
+          peticiones.modEdoLab(lab, 'Reservado')
+          await peticiones.setComputadorasEdo('Ocupada', lab);
+        }
+        reservaContinue(type, hora, lab, fin, usuario)
+        res.json({ message: "Reserva hecha", status: 0, type: type });
+      }
+      else
+        res.json({ message: "Computadora no disponible", status: 1 });
+
+    } else {
+      console.log(err);
+      res.json({ message: "Ups hubo un error", status: 2 });
+    }
+  });
+});
+
+
 function reservaContinue(type, hora, lab, fin, usuario) {
   if (type == 1) {
     utils.addTimerReserva(fin);

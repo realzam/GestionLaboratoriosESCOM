@@ -5,12 +5,12 @@ const updateSocket = require('./sendUpdateSockets.js');
 function Labs() {
   return new Promise(async function (resolve, reject) {
     //var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
-   var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="Tiempo Libre" group by l.idLaboratorio'
-   var dia=momento.momento().day();
-   if (dia == 6 || dia == 0) {
-     dia=1;
-   }
-    mysqlConnection.query(sql,[dia], (err, rows, fields) => {
+    var sql = 'SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="Tiempo Libre" group by l.idLaboratorio'
+    var dia = momento.momento().day();
+    if (dia == 6 || dia == 0) {
+      dia = 1;
+    }
+    mysqlConnection.query(sql, [dia], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -21,11 +21,11 @@ function Labs() {
 }
 
 const forLoop1 = async (lab) => {
-  var dia=momento.momento().day()
-  lista=[];
+  var dia = momento.momento().day()
+  lista = [];
   for (var i = 0; i < lab.length; i++) {
-    var resp=await getHorasLibres(lab[i]['id_laboratorio'],dia);
-    lab[i]['horas_libres']=resp;
+    var resp = await getHorasLibres(lab[i]['id_laboratorio'], dia);
+    lab[i]['horas_libres'] = resp;
   }
   return new Promise(resolve => resolve(1));
 }
@@ -285,6 +285,27 @@ function getComputadoras(lab) {
     });
   });
 }
+const forLoop2 = async (hora, dia) => {
+  var lista=[];
+  var compu = {}
+  for (var i = 1; i <= 34; i++) {
+    compu['idComputadora'] = i;
+    lista.push(Object.assign({}, compu))
+  }
+  return new Promise(resolve => resolve(lista));
+}
+
+function getLaboratorioReservado(lab, hora) {
+  return new Promise(resolve => {
+    mysqlConnection.query('select idLaboratorio  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado="En espera"', [lab, hora], (err, rows, fields) => {
+      if (!err) {
+        resolve(rows)
+      } else {
+        console.log(err)
+      }
+    });
+  });
+}
 function getComputadorasReservadas(lab, hora) {
   return new Promise(resolve => {
     mysqlConnection.query('select idComputadora  from ReservaComputadora where idLaboratorio=? and hora=? and estado="En espera" order by idComputadora', [lab, hora], (err, rows, fields) => {
@@ -296,15 +317,26 @@ function getComputadorasReservadas(lab, hora) {
     });
   });
 }
+
 function getComputadorasFuture(lab, hora) {
   return new Promise(async function (resolve, reject) {
     var responseG = {}
     responseG['comando'] = '/computadorasFuture';
     responseG['ok'] = true;
     var compusl = [];
-    var res = await getComputadorasReservadas(lab, hora);
     var reservadas = [];
+    var res = await getLaboratorioReservado(lab, hora);
+    
+    if(res.length==1)
+    {
+      console.log('hay lab resrva')
+      res=await forLoop2();
+      //console.log(res)
+    }else{
+       res = await getComputadorasReservadas(lab, hora);
+    }
     for (const item of res) {
+      //console.log(item)
       reservadas.push(item['idComputadora']);
     }
     for (let i = 1; i <= 34; i++) {
@@ -343,9 +375,21 @@ function miReserva(boleta) {
   });
 }
 
+function miReserva2(usuario) {
+  return new Promise(resolve => {
+    mysqlConnection.query('select idUsuario as id_usuario,idLaboratorio as id_laboratorio,inicio,dia,hora,fin,estado from ReservaLaboratorio where idUsuario=? and (estado="En espera" or estado="En uso")', [usuario], (err, rows, fields) => {
+      if (!err) {
+        resolve(rows);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+}
+
 module.exports.getLabs = getLabs;
 module.exports.getLibreLaboratorio = getLibreLaboratorio;
-module.exports.Labs=Labs;
+module.exports.Labs = Labs;
 module.exports.getComputadoras = getComputadoras;
 module.exports.getComputadorasFuture = getComputadorasFuture;
 module.exports.getHorasLibres = getHorasLibres;
@@ -362,3 +406,4 @@ module.exports.setComputadorasReservadas = setComputadorasReservadas;
 
 module.exports.reservaTimeOut = reservaTimeOut;
 module.exports.miReserva = miReserva;
+module.exports.miReserva2 = miReserva2;
