@@ -185,10 +185,10 @@ router.post('/reservaComputadora', async (req, res) => {
   var formato = 'YYYY-MM-DD HH:mm:ss';
   var dia = momento.momento().day()
   var type;
-  if (utils.compareDate(inicio, utils.getDateFromID(hora)) == inicio) {
+  if (utils.compareDate(inicio, utils.getDateFromID(hora)) == inicio) {//now
     var fin = inicio.clone().add(global.reservaTime, global.reservaTimeType);
     type = 1;
-  } else {
+  } else {//futuro
     var fin = utils.getDateFromID(hora).add(global.reservaTime, global.reservaTimeType);
     type = 2;
   }
@@ -216,6 +216,30 @@ router.post('/reservaComputadora', async (req, res) => {
   });
 });
 
+function canelatReservaUsuario(usuario) {
+   return new Promise(resolve => {
+  const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
+  mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
+   if (!err) {
+      if (utils.getHoraID(momento.momento()) == hora) 
+        peticiones.modEdoLab(lab, 'Tiempo libre')
+      updateSocket.sendUpdateReserva(usuario);
+      resolve(true)
+    } else {
+      console.log(err);
+      resolve(false)
+    }
+  }); 
+});
+}
+
+const canelarReserva = async (reservas) => {
+  for (var i = 0; i < reservas.length; i++) {
+    await canelatReservaUsuario(reservas[0].idUsuario)
+  }
+  return new Promise(resolve => resolve(1));
+}
+
 router.post('/reservaLaboratorio', async (req, res) => {
   const { usuario, lab, hora } = req.body;
   var edo = "En espera"
@@ -242,7 +266,8 @@ router.post('/reservaLaboratorio', async (req, res) => {
     res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
-
+  var reservasCancel=await peticiones.getComputadorasReservadas(lab,hora)
+  await canelarReserva(reservasCancel);
   mysqlConnection.query(query, [usuario,  lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
@@ -283,7 +308,6 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
   var resp = await peticiones.miReserva(usuario);
   var lab;
   var hora;
-  var compu;
   if (resp.length > 0) {
     lab = resp[0]['id_laboratorio'];
     hora = resp[0]['hora'];
@@ -296,8 +320,6 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
-        peticiones.modEdoLab(lab, 'Tiempo libre')
-        await peticiones.setComputadorasEdo('Ocupada', lab);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
       } else
@@ -317,7 +339,6 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
   var resp = await peticiones.miReserva2(usuario);
   var lab;
   var hora;
-  var compu;
   if (resp.length > 0) {
     lab = resp[0]['id_laboratorio'];
     hora = resp[0]['hora'];
@@ -329,7 +350,8 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
-        await peticiones.modCompu(compu, lab, 'Disponible')
+        peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
+        await peticiones.setComputadorasEdo('Disponible', 0);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
       } else
