@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos</title>
+</head>
+<body>
+    <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <td>num</td>
+            <td>id horario</td>
+            <td>calse</td>
+            <td>hora</td>
+            <td>dia</td>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (data) { %>
+            <% for(var i = 0; i < data.length; i++) { %>
+              <tr>
+                <td><%= (i + 1) %></td>
+                <td><%= data[i].idHorario %></td>
+                <td><%= data[i].clase %></td>
+                <td><%= data[i].hora %></td>
+                <td><%= data[i].dia %></td>
+              </tr>
+            <% } %>
+          <% } %>
+        </tbody>
+      </table>
+</body>
+</html>

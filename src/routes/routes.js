@@ -16,6 +16,16 @@ router.get('/', async (req, res) => {
   res.json(labs);
 });
 
+router.get('/obtenerDatos', (req, res) => {
+  console.log('/route raiz')
+  mysqlConnection.query(' select * from Horario where idHorario=? and dia=?', [1105, 3,], (err, rows, fields) => {
+    if (!err) {
+      res.render('datos', {data: rows});
+    } else {
+      res.json({ error: "ups hubo algun error :(" });
+    }
+  });
+});
 
 
 router.put('/modifyComputadora/:id', (req, res) => {
@@ -267,7 +277,7 @@ function reservaContinue(type, hora, lab, fin, usuario) {
   updateSocket.sendUpdateReserva(usuario);
 }
 
-router.put('/cancelarReserva/:usuario', async (req, res) => {
+router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
   const { usuario } = req.params;
   const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
   var resp = await peticiones.miReserva(usuario);

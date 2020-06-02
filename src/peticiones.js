@@ -407,3 +407,4 @@ module.exports.reservaTimeOut = reservaTimeOut;
 module.exports.miReserva = miReserva;
 module.exports.miReserva2 = miReserva2;
 module.exports.getLaboratorioReservado=getLaboratorioReservado;
+module.exports.getComputadorasReservadas= getComputadorasReservadas;

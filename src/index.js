@@ -7,7 +7,6 @@ const utils = require('./utils.js');
 const peticiones = require('./peticiones.js');
 var request = require('request');
 const moment = require('moment');
-var momentzone = require('moment-timezone');
 const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
 //momento.setFecha(moment('2020-06-01T21:29:50'));
@@ -119,6 +118,7 @@ function heartbeat() {
 }
 
 let interval2 = () => {
+  isAliveClient();
   console.log('hola mundo, no sleep', momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
     if (!error && res.statusCode == 200) { }
