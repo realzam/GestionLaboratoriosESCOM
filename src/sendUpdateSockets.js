@@ -44,6 +44,7 @@ async function sendUpdateComputadorasFuture(lab,hora)
   return new Promise( async function (resolve) {
     responseG={};
     responseG['comando']="/miReserva"
+    console.log('reserva de',boleta)
     var reservas=[];
     var info=await peticiones.miReserva(boleta);
     var info2=await peticiones.miReserva2(boleta);

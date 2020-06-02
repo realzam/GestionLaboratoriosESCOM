@@ -18,7 +18,9 @@ function nextTimer(date,opc)
     return now;
   }
   var id=getHoraID(now);
-  var res=(id==-1||id==11)?setHora(now.add(1,'day'),7,0,0).add(addtime,global.reservaTimeType):getDateFromID(id+1).add(addtime,global.reservaTimeType);
+  if(id==11)
+    return setHora(now,21,30,00)
+  var res=(id==-1)?setHora(now.add(1,'day'),7,0,0).add(addtime,global.reservaTimeType):getDateFromID(id+1).add(addtime,global.reservaTimeType);
   //console.log('nexTimer',res.format('dddd D MMMM YYYY H:mm:ss'));
   return res;   
 }

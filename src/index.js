@@ -10,7 +10,7 @@ const moment = require('moment');
 var momentzone = require('moment-timezone');
 const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
-
+momento.setFecha(moment('2020-06-01T21:29:50'));
 // Settings
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -32,7 +32,6 @@ global.reservaTime = 10;
 global.reservaTimeType = 'minute';// second  minute
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
-
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
   var resp = await peticiones.getReservasEnEspera();
   for (const item of resp) {
@@ -59,7 +58,7 @@ async function scheduling() {
   //console.log('horario',momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   var dateS = await updateSocket.sendServerDate();
   sendAll(dateS, null, null);
-  
+
   var hora;
   var dia = momento.momento().day();
   if (dia == 6 || dia == 0) {
@@ -81,7 +80,6 @@ async function scheduling() {
   }
   updateSocket.sendUpdateLabs();
   timeOutSheduling = setTimeout(() => { scheduling() }, utils.nextTimer(momento.momento()) - momento.momento())
-
 }
 
 
@@ -168,6 +166,16 @@ io.on('connection', ws => {
           break;
         case 'computadorasFuture':
           res = await peticiones.getComputadorasFuture(s[2], s[3])// /computadorasFuture/lab/hora
+          break;
+        case 'reservaLaboratorio':
+          var responseG = {}
+          var aux = []
+          responseG['comando'] = '/reservaLaboratorio';
+          var temp = await peticiones.getLaboratorioReservado(s[2], s[3])// /reservaLaboratorio/lab/hora
+          if (temp.length > 0)
+            aux.push(temp[0]);
+          responseG['info'] = aux;
+          res=JSON.stringify(responseG);
           break;
         case 'infoS':
           res = await updateSocket.sendServerDate();

@@ -297,7 +297,7 @@ const forLoop2 = async (hora, dia) => {
 
 function getLaboratorioReservado(lab, hora) {
   return new Promise(resolve => {
-    mysqlConnection.query('select idLaboratorio  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado="En espera"', [lab, hora], (err, rows, fields) => {
+    mysqlConnection.query('select *  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado="En espera"', [lab, hora], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -308,7 +308,7 @@ function getLaboratorioReservado(lab, hora) {
 }
 function getComputadorasReservadas(lab, hora) {
   return new Promise(resolve => {
-    mysqlConnection.query('select idComputadora  from ReservaComputadora where idLaboratorio=? and hora=? and estado="En espera" order by idComputadora', [lab, hora], (err, rows, fields) => {
+    mysqlConnection.query('select * from ReservaComputadora where idLaboratorio=? and hora=? and estado="En espera" order by idComputadora', [lab, hora], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -406,3 +406,4 @@ module.exports.setComputadorasReservadas = setComputadorasReservadas;
 module.exports.reservaTimeOut = reservaTimeOut;
 module.exports.miReserva = miReserva;
 module.exports.miReserva2 = miReserva2;
+module.exports.getLaboratorioReservado=getLaboratorioReservado;

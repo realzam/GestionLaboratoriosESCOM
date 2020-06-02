@@ -72,17 +72,20 @@ router.post('/add/usuario/:type', async (req, res) => {
   const { type } = req.params;
   console.log(" add alumno");
   const { id, correo, password,nombre } = req.body;
+  if(type<1 || type>3)
+  {
+    res.json({ error: "tipo no valido" });
+    return 0;
+  }
   var finalpass = await helpers.encryptPassword(password);
   const query = "select correo from Usuario where correo=?";
   const query2 = "select id from Usuario where id=?";
   const query3 = "insert into  Usuario (id,correo,tipoUsuario,password,nombre) values (?,?,?,?,?)";
-
   mysqlConnection.query(query, [correo], (err, rows, fields) => {
     if (rows.length > 0) {
       console.log("El correo ya esta en registrado");
       res.json({ error: "El correo ya esta en registrado" });
     } else if (!err) {
-
       mysqlConnection.query(query2, [id], (err2, rows2, fields2) => {
         if (rows2.length > 0) {
           console.log("el usuario ya  estaba registrado");
@@ -98,7 +101,6 @@ router.post('/add/usuario/:type', async (req, res) => {
               res.json({ error: "ups hubo algun error :(" });
             }
           });
-
         } else {
           console.log(err2);
           res.json({ error: err2 });
@@ -109,8 +111,6 @@ router.post('/add/usuario/:type', async (req, res) => {
       res.json({ error: err });
     }
   });
-
-
 });
 
 router.post('/login', async (req, res) => {
@@ -163,6 +163,11 @@ router.put('/modifyToken/:id', (req, res) => {
 
 router.post('/reservaComputadora', async (req, res) => {
   const { usuario, compu, lab, hora } = req.body;
+  if(hora<utils.getHoraID(momento.momento())||hora<1||hora>11||hora==null)
+  {
+    res.json({ message: "Hora invalida", status: 2 });
+    return 0;
+  }
   var edo = "En espera"
   //const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
   const query = "INSERT INTO ReservaComputadora () SELECT * FROM (SELECT ?,? AS idComputadora,?,?,? AS dia,? As hora,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idComputadora = ? and idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
@@ -210,6 +215,11 @@ router.post('/reservaLaboratorio', async (req, res) => {
   var formato = 'YYYY-MM-DD HH:mm:ss';
   var dia = momento.momento().day()
   var type;
+  if(hora<utils.getHoraID(momento.momento())||hora<1||hora>11||hora==null)
+  {
+    res.json({ message: "Hora invalida", status: 2 });
+    return 0;
+  }
   if (utils.compareDate(inicio, utils.getDateFromID(hora)) == inicio) {
     var fin = inicio.clone().add(global.reservaTime, global.reservaTimeType);
     type = 1;
@@ -268,6 +278,39 @@ router.put('/cancelarReserva/:usuario', async (req, res) => {
     lab = resp[0]['id_laboratorio'];
     hora = resp[0]['hora'];
     compu = resp[0]['id_computadora'];
+  }
+  else {
+    res.json({ status: "No tienes reserva" });
+    return 0;
+  }
+  mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
+   if (!err) {
+      if (utils.getHoraID(momento.momento()) == hora) {
+        peticiones.modEdoLab(lab, 'Tiempo libre')
+        await peticiones.setComputadorasEdo('Ocupada', lab);
+        updateSocket.sendUpdateComputadoras(lab);
+        updateSocket.sendUpdateLabs();
+      } else
+        updateSocket.sendUpdateComputadorasFuture(lab, hora);
+
+      updateSocket.sendUpdateReserva(usuario);
+      res.json({ status: "Reserva cancelada" });
+    } else {
+      console.log(err);
+    }
+  }); 
+});
+
+router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
+  const { usuario } = req.params;
+  const query = "update  ReservaLaboratorio set estado='Cancelada' where idUsuario=? and estado='En espera'";
+  var resp = await peticiones.miReserva2(usuario);
+  var lab;
+  var hora;
+  var compu;
+  if (resp.length > 0) {
+    lab = resp[0]['id_laboratorio'];
+    hora = resp[0]['hora'];
   }
   else {
     res.json({ status: "No tienes reserva" });
