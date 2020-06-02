@@ -10,7 +10,7 @@ const moment = require('moment');
 var momentzone = require('moment-timezone');
 const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
-momento.setFecha(moment('2020-06-01T21:29:50'));
+//momento.setFecha(moment('2020-06-01T21:29:50'));
 // Settings
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
