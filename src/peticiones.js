@@ -322,6 +322,8 @@ function getComputadorasFuture(lab, hora) {
   return new Promise(async function (resolve, reject) {
     var responseG = {}
     responseG['comando'] = '/computadorasFuture';
+    responseG['hora'] = hora;
+    responseG['lab'] = lab;
     responseG['ok'] = true;
     var compusl = [];
     var reservadas = [];
