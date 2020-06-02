@@ -66,7 +66,7 @@ async function scheduling() {
   } else {
     hora = utils.getHoraID(momento.momento());
     if (hora == 3 || hora == 9) {
-      peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
+      peticiones.setLaboratoriosEdo('Tiempo libre', 0);
       await peticiones.setComputadorasEdo('Disponible', 0);
     } else if (hora == 0 || hora == -1) {
       peticiones.setLaboratoriosEdo('No disponible', 0);

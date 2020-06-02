@@ -350,7 +350,7 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
-        peticiones.setLaboratoriosEdo('Tiempo Libre', 0);
+        peticiones.setLaboratoriosEdo('Tiempo libre', 0);
         await peticiones.setComputadorasEdo('Disponible', 0);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();

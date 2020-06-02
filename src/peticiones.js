@@ -5,7 +5,7 @@ const updateSocket = require('./sendUpdateSockets.js');
 function Labs() {
   return new Promise(async function (resolve, reject) {
     //var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
-    var sql = 'SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="Tiempo Libre" group by l.idLaboratorio'
+    var sql = 'SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles,JSON_ARRAYAGG( h.hora) as horas_libres FROM Laboratorio l, Horario h WHERE l.idLaboratorio in (1105,1106,1107,2103) and l.idLaboratorio=h.idHorario and h.dia=? and h.clase="Tiempo libre" group by l.idLaboratorio'
     var dia = momento.momento().day();
     if (dia == 6 || dia == 0) {
       dia = 1;
@@ -44,7 +44,7 @@ function getHorasLibres(lab, dia) {
   return new Promise(function (resolve, reject) {
     var res;
     var lista = [];
-    mysqlConnection.query('select hora from Horario where idHorario=? and dia=? and clase=?', [lab, dia, "Tiempo Libre"], (err, rows, fields) => {
+    mysqlConnection.query('select hora from Horario where idHorario=? and dia=? and clase=?', [lab, dia, "Tiempo libre"], (err, rows, fields) => {
       if (!err) {
         res = rows;
       } else {
@@ -164,7 +164,7 @@ function getLibreLaboratorio(lab, hora, dia) {
   return new Promise(function (resolve, reject) {
     mysqlConnection.query('select clase from Horario where idHorario= ? and hora= ? and dia= ?', [lab, hora, dia], (err, rows, fields) => {
       if (!err) {
-        if (rows[0]['clase'] == 'Tiempo Libre') {
+        if (rows[0]['clase'] == 'Tiempo libre') {
           resolve('Tiempo libre');
 
         } else {
