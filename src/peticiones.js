@@ -273,6 +273,7 @@ function enviarNotificacion(usuarios) {
 function getComputadoras(lab) {
   var responseG = {}
   responseG['comando'] = '/computadoras';
+  responseG['lab'] = lab;
   return new Promise(resolve => {
     mysqlConnection.query('select idComputadora as id_computadora,idLaboratorio as id_laboratorio,estado from Computadora where idLaboratorio=? order by idComputadora', [lab], (err, rows, fields) => {
       if (!err) {
