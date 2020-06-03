@@ -221,8 +221,6 @@ function canelatReservaUsuario(usuario) {
   const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
    if (!err) {
-      if (utils.getHoraID(momento.momento()) == hora) 
-        peticiones.modEdoLab(lab, 'Tiempo libre')
       updateSocket.sendUpdateReserva(usuario);
       resolve(true)
     } else {
@@ -320,6 +318,7 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
+        await peticiones.modCompu(compu, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
       } else
