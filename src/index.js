@@ -169,11 +169,13 @@ io.on('connection', ws => {
           break;
         case 'reservaLaboratorio':
           var responseG = {}
-          var aux = []
+          var aux = false
           responseG['comando'] = '/reservaLaboratorio';
+          responseG['lab'] = s[2];
+          responseG['hora'] = s[3];
           var temp = await peticiones.getLaboratorioReservado(s[2], s[3])// /reservaLaboratorio/lab/hora
           if (temp.length > 0)
-            aux.push(temp[0]);
+            aux=true;
           responseG['info'] = aux;
           res=JSON.stringify(responseG);
           break;
