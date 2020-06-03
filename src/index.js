@@ -153,6 +153,7 @@ io.on('connection', ws => {
   ws.idCliente = 'anonimo'
   //isAliveClient();
   ws.on('message', async (message) => {
+    print(message)
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
       var res;
