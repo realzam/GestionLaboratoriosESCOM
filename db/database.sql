@@ -1,6 +1,6 @@
 
 CREATE TABLE Usuario (
-  id INT NOT NULL,
+  id BIGINT NOT NULL,
   nombre VARCHAR(60) ,
   apellido VARCHAR(60) ,
   correo VARCHAR(60) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE Usuario (
 
 CREATE TABLE TokenNotification (
   idToken VARCHAR(160) NOT NULL,
-  usuario INT NOT NULL,
+  usuario BIGINT NOT NULL,
   foreign key(usuario) references Usuario(id)
   on delete cascade on update cascade,
   PRIMARY KEY(idToken,usuario)
@@ -59,7 +59,7 @@ CREATE TABLE Horario(
 
 
 CREATE TABLE ReservaComputadora (
-  idUsuario INT NOT NULL,
+  idUsuario BIGINT NOT NULL,
   idComputadora INT NOT NULL,
   idLaboratorio INT NOT NULL,
   inicio DATETIME,
@@ -81,7 +81,7 @@ CREATE TABLE ReservaComputadora (
 );
 
 CREATE TABLE ReservaLaboratorio (
-  idUsuario INT NOT NULL,
+  idUsuario BIGINT NOT NULL,
   idLaboratorio INT NOT NULL,
   inicio DATETIME,
   dia int,
