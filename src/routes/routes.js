@@ -264,7 +264,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
     res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
-  var after=await peticiones.getLaboratorioReservado(lab, helpers);
+  var after=await peticiones.getLaboratorioReservado(lab, hora);
   if (after.length > 0) {
     res.json({ message: "El laboratorio ya no est diponible", status: 2 });
     return 0
