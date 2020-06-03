@@ -274,6 +274,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
   mysqlConnection.query(query, [usuario,  lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] > 0) {
+        console.log('affectedRows',rows['affectedRows'])
         if (type == 1)
         {
           peticiones.modEdoLab(lab, 'Reservado')
