@@ -264,11 +264,16 @@ router.post('/reservaLaboratorio', async (req, res) => {
     res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
+  var after=await peticiones.getLaboratorioReservado(lab, helpers);
+  if (after.length > 0) {
+    res.json({ message: "El laboratorio ya no est diponible", status: 2 });
+    return 0
+  }
   var reservasCancel=await peticiones.getComputadorasReservadas(lab,hora)
   await canelarReserva(reservasCancel);
   mysqlConnection.query(query, [usuario,  lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
-      if (rows['affectedRows'] == 1) {
+      if (rows['affectedRows'] > 0) {
         if (type == 1)
         {
           peticiones.modEdoLab(lab, 'Reservado')
@@ -278,7 +283,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
         res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
-        res.json({ message: "Computadora no disponible", status: 1 });
+        res.json({ message: "El laboratorio ya no est diponible", status: 1 });
 
     } else {
       console.log(err);
