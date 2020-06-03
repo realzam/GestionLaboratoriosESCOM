@@ -153,7 +153,6 @@ io.on('connection', ws => {
   ws.idCliente = 'anonimo'
   //isAliveClient();
   ws.on('message', async (message) => {
-    console.log(message)
     if (message.indexOf('/') != -1) {
       var s = message.split('/');
       var res;
@@ -176,8 +175,8 @@ io.on('connection', ws => {
           responseG['hora'] = s[3];
           var temp;
           if (utils.getHoraID(momento.momento()) == s[3]) {
-            temp = await peticiones.getLibreLaboratorio(s[2], s[3], momento.momento().day)
-            if (temp == "Tiempo libre")
+            temp = await peticiones.getLibreLaboratorio(s[2], s[3], momento.momento().day())
+             if (temp != "Tiempo libre")
               aux = true;
           }
           else {
