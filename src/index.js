@@ -173,11 +173,19 @@ io.on('connection', ws => {
           responseG['comando'] = '/reservaLaboratorio';
           responseG['lab'] = s[2];
           responseG['hora'] = s[3];
-          var temp = await peticiones.getLaboratorioReservado(s[2], s[3])// /reservaLaboratorio/lab/hora
-          if (temp.length > 0)
-            aux=true;
+          var temp;
+          if (utils.getHoraID(momento.momento()) == s[3]) {
+            temp = await peticiones.getLibreLaboratorio(s[2], s[3], momento.momento().day)
+            if (temp == "Tiempo libre")
+              aux = true;
+          }
+          else {
+            temp = await peticiones.getLaboratorioReservado(s[2], s[3])// /reservaLaboratorio/lab/hora
+            if (temp.length > 0)
+              aux = true;
+          }
           responseG['info'] = aux;
-          res=JSON.stringify(responseG);
+          res = JSON.stringify(responseG);
           break;
         case 'infoS':
           res = await updateSocket.sendServerDate();
