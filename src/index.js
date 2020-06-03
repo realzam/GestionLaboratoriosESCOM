@@ -9,7 +9,7 @@ var request = require('request');
 const moment = require('moment');
 const updateSocket = require('./sendUpdateSockets.js');
 const app = express();
-momento.setFecha(moment('2020-06-02T09:29:45'));
+momento.setFecha(moment('2020-06-02T09:59:45'));
 // Settings
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
