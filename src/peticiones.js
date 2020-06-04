@@ -194,11 +194,12 @@ async function reservaTimeOut(date) {
     var edo2 = "En espera";
     console.log('reservaTimeOut date', date)
 
-    await getreservaTimeOutNotification(date);
+    var reservas=await getreservaTimeOutNotification(date);
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
       if (!err) {
         console.log(rows['changedRows'] + ' reservas no completadas')
         resolve(true)
+        sendReservasAdmin(reservas)
       } else {
         console.log(err)
       }
@@ -206,6 +207,12 @@ async function reservaTimeOut(date) {
   });
 }
 
+function sendReservasAdmin(reservadas)
+{
+  for (const element in reservadas) {
+    updateSocket.sendUpdateReservaAdmin(element['idLaboratorio'],element['tipoUsuario']);
+  }
+}
 function getreservaTimeOutNotification(date) {
   return new Promise(resolve => {
     var sql="select u.tipoUsuario,t.usuario, r.idComputadora,r.idLaboratorio,JSON_ARRAYAGG(t.idToken) as tokenNoti from ReservaComputadora r, TokenNotification t,Usuario u where r.fin=? and r.estado='En espera' and r.idUsuario=t.usuario and u.id=r.idUsuario group by t.usuario"
@@ -217,16 +224,15 @@ function getreservaTimeOutNotification(date) {
             const element = rows[i];
             await modCompu(element['idComputadora'], element['idLaboratorio'], 'Disponible')
             updateSocket.sendUpdateComputadoras(element['idLaboratorio'])
-            updateSocket.sendUpdateReservaAdmin(element['idLaboratorio'],element['tipoUsuario']);
           }
           
           //enviarNotificacion(rows)
         }
 
-        resolve(true)
+        resolve(rows)
       } else {
         console.log(err)
-        resolve(false)
+        resolve([])
       }
     });
   });
