@@ -198,16 +198,21 @@ io.on('connection', ws => {
           var responseG = {}  // /id/usuarioID/{lab}
           ws.idCliente = s[2];
           if (s[3] == null)
+          {
             ws.laboratorio = null;
+            responseG['info'] = "bienvendio " + s[2];
+          }
           else {
             try {
-              ws.laboratorio = parseInt(s[3])
+              ws.laboratorio = parseInt(s[3]);
+              responseG['info'] = "bienvendio " + s[2]+' del laboratorio '+s[3];
             } catch (e) {
               console.log(e);
               ws.laboratorio = null;
+              responseG['info'] = "bienvendio " + s[2];
             }
           }
-          responseG['info'] = "bienvendio " + s[2];
+         
           res = JSON.stringify(responseG);
           para = ws.idCliente;
           break;
