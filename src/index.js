@@ -214,13 +214,17 @@ io.on('connection', ws => {
         case 'reservasAdmin':
           if (ws.laboratorio == null) {
             var responseG = {}
+            responseG['comando'] = '/reservasAdmin';
             responseG['ok'] = false;
+            responseG['mesage'] = 'laboratorio nulo';
             res = JSON.stringify(responseG);
           }
           else {
             if (global.labslist.indexOf(ws.laboratorio) == -1) {
               var responseG = {}
+              responseG['comando'] = '/reservasAdmin';
               responseG['ok'] = false;
+              responseG['mesage'] = 'laboratorio desconocido';
               res = JSON.stringify(responseG);
             }else
               res = await peticiones.getReservasAdmin(ws.laboratorio,s[2]);
@@ -257,6 +261,7 @@ io.on('disconnect', function () {
 io.once('disconnect', function () {
   console.log('adios server');
 });
+/*
 function isAliveClient() {
   console.log('================================')
   for (let i = 0; i < CLIENTS.length;) {
@@ -268,7 +273,7 @@ function isAliveClient() {
     }
     i++
   }
-}
+}*/
 
 function sendAll(message, yo, to) {
   if (typeof message === 'string' || message instanceof String) {
