@@ -209,7 +209,8 @@ async function reservaTimeOut(date) {
 
 function sendReservasAdmin(reservadas)
 {
-  for (const element in reservadas) {
+  for (var i=0;i<reservadas.length;i++) {
+    var element=reservadas[i];
     updateSocket.sendUpdateReservaAdmin(element['idLaboratorio'],element['tipoUsuario']);
   }
 }
