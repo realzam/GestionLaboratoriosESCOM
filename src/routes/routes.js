@@ -104,11 +104,13 @@ router.post('/add/usuario/:type', async (req, res) => {
     if (rows.length > 0) {
       console.log("El correo ya esta en registrado");
       res.json({ error: "El correo ya esta en registrado" });
+      return 0;
     } else if (!err) {
       mysqlConnection.query(query2, [id], (err2, rows2, fields2) => {
         if (rows2.length > 0) {
           console.log("el usuario ya  estaba registrado");
           res.json({ error: "el usuario ya  estaba registrado" });
+          return 0;
         } else if (!err2) {
 
           mysqlConnection.query(query3, [id, nombre, correo, type, finalpass, labf], (err3, rows3, fields3) => {
@@ -122,12 +124,12 @@ router.post('/add/usuario/:type', async (req, res) => {
           });
         } else {
           console.log(err2);
-          res.json({ error: err2 });
+          res.json({ error: 'ups hubo algun error :(' });
         }
       });
     } else {
       console.log(err);
-      res.json({ error: err });
+      res.json({ error: 'ups hubo algun error :(' });
     }
   });
 });
