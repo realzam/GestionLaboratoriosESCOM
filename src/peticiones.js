@@ -391,7 +391,7 @@ function miReserva2(usuario) {
 function getReservasAdminInfo(admin, tipo) {
   var sql = '';
   if (tipo == 1) {
-    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso") order by r.hora';
+    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and r.tipoUsuario=1 and(r.estado="En espera" or r.estado="En uso") order by r.hora';
   } else
     sql = 'select r.idUsuario as id_usuario,u.nombre, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaLaboratorio r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso") order by r.hora';
     return new Promise(resolve => {
