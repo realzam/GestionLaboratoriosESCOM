@@ -1,10 +1,18 @@
 
 CREATE TABLE Usuario (
   id BIGINT NOT NULL,
-  nombre VARCHAR(60) ,
-  apellido VARCHAR(60) ,
+  nombre VARCHAR(100) ,
   correo VARCHAR(60) NOT NULL,
   tipoUsuario TinyInt NOT NULL,
+  password VARCHAR(60) NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE Adminsitrador (
+  id BIGINT NOT NULL,
+  nombre VARCHAR(100) ,
+  correo VARCHAR(60) NOT NULL,
+  laboratorio int NOT NULL,
   password VARCHAR(60) NOT NULL,
   PRIMARY KEY(id)
 );

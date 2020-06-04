@@ -20,7 +20,7 @@ router.get('/obtenerDatos', (req, res) => {
   console.log('/route raiz')
   mysqlConnection.query(' select * from Horario where idHorario=? and dia=?', [1105, 3,], (err, rows, fields) => {
     if (!err) {
-      res.render('datos', {data: rows});
+      res.render('datos', { data: rows });
     } else {
       res.json({ error: "ups hubo algun error :(" });
     }
@@ -81,16 +81,25 @@ router.delete('/:id', (req, res) => {
 router.post('/add/usuario/:type', async (req, res) => {
   const { type } = req.params;
   console.log(" add alumno");
-  const { id, correo, password,nombre } = req.body;
-  if(type<1 || type>3)
-  {
+  const { id, correo, password, nombre, lab } = req.body;
+  var labf = lab
+  if (type < 1 || type > 3) {
     res.json({ error: "tipo no valido" });
     return 0;
+  }
+
+  if (type == 3 && (labf == null || global.labslist.indexOf(labf) == -1))//global.labslist
+  {
+    res.json({ error: "laboratorio no valido" });
+    return 0;
+  }
+  else if (type == 1 || type == 2) {
+    labf = null
   }
   var finalpass = await helpers.encryptPassword(password);
   const query = "select correo from Usuario where correo=?";
   const query2 = "select id from Usuario where id=?";
-  const query3 = "insert into  Usuario (id,correo,tipoUsuario,password,nombre) values (?,?,?,?,?)";
+  const query3 = "insert into  Usuario () values (?,?,?,?,?,?)";
   mysqlConnection.query(query, [correo], (err, rows, fields) => {
     if (rows.length > 0) {
       console.log("El correo ya esta en registrado");
@@ -102,7 +111,7 @@ router.post('/add/usuario/:type', async (req, res) => {
           res.json({ error: "el usuario ya  estaba registrado" });
         } else if (!err2) {
 
-          mysqlConnection.query(query3, [id, correo, type, finalpass,nombre], (err3, rows3, fields3) => {
+          mysqlConnection.query(query3, [id, nombre, correo, type, finalpass, labf], (err3, rows3, fields3) => {
             if (!err3) {
               console.log("Usuario guardado");
               res.json({ status: "Usuario guardado" });
@@ -134,7 +143,7 @@ router.post('/login', async (req, res) => {
       //console.log('rows',rows[0]['password'])
       const validPass = await helpers.matchPassword(password, rows[0]['password']);
       if (validPass)
-        res.json({ status: "ok",type: rows[0]['tipoUsuario']});
+        res.json({ status: "ok", type: rows[0]['tipoUsuario'] });
       else
         res.json({ error: "Usuario o Contraseña incorrecta" });
     } else {
@@ -173,8 +182,7 @@ router.put('/modifyToken/:id', (req, res) => {
 
 router.post('/reservaComputadora', async (req, res) => {
   const { usuario, compu, lab, hora } = req.body;
-  if(hora<utils.getHoraID(momento.momento())||hora<1||hora>11||hora==null)
-  {
+  if (hora < utils.getHoraID(momento.momento()) || hora < 1 || hora > 11 || hora == null) {
     res.json({ message: "Hora invalida", status: 2 });
     return 0;
   }
@@ -217,18 +225,18 @@ router.post('/reservaComputadora', async (req, res) => {
 });
 
 function canelatReservaUsuario(usuario) {
-   return new Promise(resolve => {
-  const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
-  mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
-   if (!err) {
-      updateSocket.sendUpdateReserva(usuario);
-      resolve(true)
-    } else {
-      console.log(err);
-      resolve(false)
-    }
-  }); 
-});
+  return new Promise(resolve => {
+    const query = "update  ReservaComputadora set estado='Cancelada' where idUsuario=? and estado='En espera'";
+    mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
+      if (!err) {
+        updateSocket.sendUpdateReserva(usuario);
+        resolve(true)
+      } else {
+        console.log(err);
+        resolve(false)
+      }
+    });
+  });
 }
 
 const canelarReserva = async (reservas) => {
@@ -247,8 +255,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
   var formato = 'YYYY-MM-DD HH:mm:ss';
   var dia = momento.momento().day()
   var type;
-  if(hora<utils.getHoraID(momento.momento())||hora<1||hora>11||hora==null)
-  {
+  if (hora < utils.getHoraID(momento.momento()) || hora < 1 || hora > 11 || hora == null) {
     res.json({ message: "Hora invalida", status: 2 });
     return 0;
   }
@@ -264,19 +271,18 @@ router.post('/reservaLaboratorio', async (req, res) => {
     res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
-  var after=await peticiones.getLaboratorioReservado(lab, hora);
+  var after = await peticiones.getLaboratorioReservado(lab, hora);
   if (after.length > 0) {
     res.json({ message: "El laboratorio ya no est diponible", status: 2 });
     return 0
   }
-  var reservasCancel=await peticiones.getComputadorasReservadas(lab,hora)
+  var reservasCancel = await peticiones.getComputadorasReservadas(lab, hora)
   await canelarReserva(reservasCancel);
-  mysqlConnection.query(query, [usuario,  lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] > 0) {
-        console.log('affectedRows',rows['affectedRows'])
-        if (type == 1)
-        {
+        console.log('affectedRows', rows['affectedRows'])
+        if (type == 1) {
           peticiones.modEdoLab(lab, 'Reservado')
           await peticiones.setComputadorasEdo('Ocupada', lab);
         }
@@ -322,7 +328,7 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
     return 0;
   }
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
-   if (!err) {
+    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
         await peticiones.modCompu(compu, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
@@ -335,7 +341,7 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
     } else {
       console.log(err);
     }
-  }); 
+  });
 });
 
 router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
@@ -353,7 +359,7 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
     return 0;
   }
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
-   if (!err) {
+    if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
         peticiones.setLaboratoriosEdo('Tiempo libre', 0);
         await peticiones.setComputadorasEdo('Disponible', 0);
@@ -367,7 +373,7 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
     } else {
       console.log(err);
     }
-  }); 
+  });
 });
 
 router.post('/hora', async (req, res) => {
@@ -382,16 +388,16 @@ router.post('/hora', async (req, res) => {
 });
 router.post('/tokenNotification', async (req, res) => {
   const { token, usuario } = req.body;//2020-05-19T12:09:00
-  var query='INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ?) LIMIT 1';
-  mysqlConnection.query(query, [token, usuario,token], async (err, rows, fields) => {
+  var query = 'INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ?) LIMIT 1';
+  mysqlConnection.query(query, [token, usuario, token], async (err, rows, fields) => {
     if (!err) {
       res.json({ status: true });
-       
-     } else {
-       console.log(err);
-       res.json({ status: false });
-     }
-   }); 
+
+    } else {
+      console.log(err);
+      res.json({ status: false });
+    }
+  });
 });
 
 router.post('/horario', async (req, res) => {
@@ -450,7 +456,7 @@ router.post('/horario', async (req, res) => {
     var labAux = resp['info'][0]['idHorario'];
     for (let i = 0; i < resp['info'].length; i++) {
       var element = resp['info'][i];
-      if (resp['info'].length == 1||i==resp['info'].length-1) {
+      if (resp['info'].length == 1 || i == resp['info'].length - 1) {
         claseO['clase'] = element['clase'];
         claseO['hora'] = element['hora'];
         claseO['inicio'] = element['inicio'];
@@ -458,16 +464,14 @@ router.post('/horario', async (req, res) => {
         claseList.push(Object.assign({}, claseO))
       }
 
-      if(diaAux!=element['dia'] || labAux!= element['idHorario'] || i==resp['info'].length-1)
-      {
+      if (diaAux != element['dia'] || labAux != element['idHorario'] || i == resp['info'].length - 1) {
         diaO['dia'] = diaAux;
         diaO['clases'] = claseList;
         diaList.push(Object.assign({}, diaO))
         claseList = [];
         diaAux = element['dia']
       }
-      if(labAux!= element['idHorario']||i==resp['info'].length-1)
-      {
+      if (labAux != element['idHorario'] || i == resp['info'].length - 1) {
         labO['id_laboratorio'] = labAux;
         labO['dias'] = diaList;
         diaList = [];
