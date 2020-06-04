@@ -24,10 +24,10 @@ async function sendUpdateComputadorasFuture(lab, hora) {
 
 async function sendUpdateReservaAdmin(lab,tipo) {
   console.log('sendUpdateReservaAdmin')
-  var hora=await sendServerDate();
-  index.sendAll(hora, null, null);
   var res = await peticiones.getReservasAdmin(lab,tipo)
   index.sendAll(res, null, lab)
+  var hora=await sendServerDate();
+  index.sendAll(hora, null, null);
 }
 
 function sendServerDate() {

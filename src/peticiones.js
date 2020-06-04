@@ -208,7 +208,7 @@ async function reservaTimeOut(date) {
 
 function getreservaTimeOutNotification(date) {
   return new Promise(resolve => {
-    var sql="select t.usuario, r.idComputadora,r.idLaboratorio,JSON_ARRAYAGG(t.idToken) as tokenNoti from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado='En espera' and r.idUsuario=t.usuario group by t.usuario"
+    var sql="select u.tipoUsuario,t.usuario, r.idComputadora,r.idLaboratorio,JSON_ARRAYAGG(t.idToken) as tokenNoti from ReservaComputadora r, TokenNotification t,Usuario u where r.fin=? and r.estado='En espera' and r.idUsuario=t.usuario and u.id=r.idUsuario group by t.usuario"
     mysqlConnection.query(sql, [date], async (err, rows, fields) => {
       if (!err) {
         console.log('reservaTimeOutSendNotification', rows.length)
