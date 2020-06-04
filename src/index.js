@@ -227,7 +227,7 @@ io.on('connection', ws => {
               responseG['mesage'] = 'laboratorio desconocido';
               res = JSON.stringify(responseG);
             }else
-              res = await peticiones.getReservasAdmin(ws.laboratorio,s[2]);
+              res = await peticiones.getReservasAdmin(ws.laboratorio,parseInt(s[2]));
           }
 
           break;
