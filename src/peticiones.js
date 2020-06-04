@@ -209,7 +209,7 @@ async function reservaTimeOut(date) {
 function getreservaTimeOutNotification(date) {
   var edo = "En espera";
   return new Promise(resolve => {
-    mysqlConnection.query('select r.idComputadora,r.idLaboratorio,t.idToken from ReservaComputadora r, TokenNotification t where r.fin=? and r.estado=? and r.idUsuario=t.usuario', [date, edo], async (err, rows, fields) => {
+    mysqlConnection.query('select u.tipoUsuario, r.idComputadora,r.idLaboratorio,t.idToken from ReservaComputadora r, TokenNotification t, Usuario u where r.fin=? and r.estado=? and r.idUsuario=t.usuario u.id=r.idUsuario', [date, edo], async (err, rows, fields) => {
       if (!err) {
         console.log('reservaTimeOutSendNotification', rows.length)
         if (rows.length > 0) {
@@ -217,6 +217,7 @@ function getreservaTimeOutNotification(date) {
             const element = rows[i];
             await modCompu(element['idComputadora'], element['idLaboratorio'], 'Disponible')
             updateSocket.sendUpdateComputadoras(element['idLaboratorio'])
+            updateSocket.sendUpdateReservaAdmin(element['idLaboratorio'],element['tipoUsuario']);
           }
 
           enviarNotificacion(rows)

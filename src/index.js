@@ -28,7 +28,7 @@ var timeOutSheduling;
 global.labslist = [1105, 1106, 1107, 2103];
 global.timersReserva = [];
 global.reservaTime = 10;
-global.reservaTimeType = 'minute';// second  minute
+global.reservaTimeType = 'second';// second  minute
 utils.setTimersReservas();
 const server = app.listen(app.get('port'), async () => {
   console.log('now', momento.momento().format('dddd D MMMM YYYY H:mm:ss:SSS'));
