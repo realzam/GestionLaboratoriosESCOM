@@ -415,7 +415,7 @@ function getReservasAdminInfo(admin, tipo) {
 function getReservasAdmin(admin, tipo) {
  
   return new Promise(async function (resolve, reject) {
-    responseG={}
+    var responseG={}
     var info = await getReservasAdminInfo(admin, tipo);
     responseG['comando'] = '/reservasAdmin';
     responseG['ok'] = true;

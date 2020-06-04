@@ -32,7 +32,7 @@ async function sendUpdateReservaAdmin(lab,tipo) {
 
 function sendServerDate() {
   return new Promise(resolve => {
-    responseG = {};
+    var responseG = {};
     responseG['comando'] = "/infoS"
     responseG['fecha_servidor'] = momento.momento().format('YYYY-MM-DD HH:mm:ss');
     responseG['hora_id'] = utils.getHoraID(momento.momento())
@@ -44,7 +44,7 @@ function sendServerDate() {
 
 function sendReserva(boleta) {
   return new Promise(async function (resolve) {
-    responseG = {};
+    var responseG = {};
     responseG['comando'] = "/miReserva"
     console.log('reserva de', boleta)
     var reservas = [];
