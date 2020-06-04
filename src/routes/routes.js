@@ -392,8 +392,8 @@ router.post('/hora', async (req, res) => {
 });
 router.post('/tokenNotification', async (req, res) => {
   const { token, usuario } = req.body;//2020-05-19T12:09:00
-  var query = 'INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ?) LIMIT 1';
-  mysqlConnection.query(query, [token, usuario, token], async (err, rows, fields) => {
+  var query = 'INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ? and usuario = ?) LIMIT 1';
+  mysqlConnection.query(query, [token, usuario, token,usuario], async (err, rows, fields) => {
     if (!err) {
       res.json({ status: true });
 
