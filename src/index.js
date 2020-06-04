@@ -118,7 +118,6 @@ function heartbeat() {
 }
 
 let interval2 = () => {
-  isAliveClient();
   console.log('hola mundo, no sleep', momento.momento().format('dddd MMMM YYYY H:mm:ss'));
   request('https://proyectoescom.herokuapp.com/', function (error, res, body) {
     if (!error && res.statusCode == 200) { }
@@ -150,7 +149,8 @@ io.on('connection', ws => {
   ws.isAlive = true;
   ws.hola = 'mundo ' + Math.floor((Math.random() * 100) + 1);
   ws.on('pong', heartbeat);
-  ws.idCliente = 'anonimo'
+  ws.idCliente = 'anonimo';
+  ws.laboratorio = null;
   //isAliveClient();
   ws.on('message', async (message) => {
     if (message.indexOf('/') != -1) {
@@ -176,7 +176,7 @@ io.on('connection', ws => {
           var temp;
           if (utils.getHoraID(momento.momento()) == s[3]) {
             temp = await peticiones.getLibreLaboratorio(s[2], s[3], momento.momento().day())
-             if (temp != "Tiempo libre")
+            if (temp != "Tiempo libre")
               aux = true;
           }
           else {
@@ -195,11 +195,37 @@ io.on('connection', ws => {
           para = ws.idCliente;
           break;
         case 'id':
-          var responseG = {}
+          var responseG = {}  // /id/usuarioID/{lab}
           ws.idCliente = s[2];
+          if (s[3] == null)
+            ws.laboratorio = null;
+          else {
+            try {
+              ws.laboratorio = parseInt(s[3])
+            } catch (e) {
+              console.log(e);
+              ws.laboratorio = null;
+            }
+          }
           responseG['info'] = "bienvendio " + s[2];
           res = JSON.stringify(responseG);
           para = ws.idCliente;
+          break;
+        case 'reservasAdmin':
+          if (ws.laboratorio == null) {
+            var responseG = {}
+            responseG['ok'] = false;
+            res = JSON.stringify(responseG);
+          }
+          else {
+            if (global.labslist.indexOf(ws.laboratorio) == -1) {
+              var responseG = {}
+              responseG['ok'] = false;
+              res = JSON.stringify(responseG);
+            }else
+              res = await peticiones.getReservasAdmin(ws.laboratorio,s[2]);
+          }
+
           break;
         default:
           var responseG = {}
@@ -250,7 +276,7 @@ function sendAll(message, yo, to) {
 
       if (CLIENTS[i] != yo) {
         if (to != null) {
-          if (CLIENTS[i].idCliente == to)
+          if (CLIENTS[i].idCliente == to ||CLIENTS[i].laboratorio==to)
             CLIENTS[i].send(message);
           continue;
         }

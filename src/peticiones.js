@@ -287,7 +287,7 @@ function getComputadoras(lab) {
   });
 }
 const forLoop2 = async (hora, dia) => {
-  var lista=[];
+  var lista = [];
   var compu = {}
   for (var i = 1; i <= 34; i++) {
     compu['idComputadora'] = i;
@@ -298,7 +298,7 @@ const forLoop2 = async (hora, dia) => {
 
 function getLaboratorioReservado(lab, hora) {
   return new Promise(resolve => {
-    mysqlConnection.query('select *  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado=?', [lab, hora,"En espera"], (err, rows, fields) => {
+    mysqlConnection.query('select *  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado=?', [lab, hora, "En espera"], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -329,13 +329,12 @@ function getComputadorasFuture(lab, hora) {
     var compusl = [];
     var reservadas = [];
     var res = await getLaboratorioReservado(lab, hora);
-    
-    if(res.length==1)
-    {
-      res=await forLoop2();
+
+    if (res.length == 1) {
+      res = await forLoop2();
       //console.log(res)
-    }else{
-       res = await getComputadorasReservadas(lab, hora);
+    } else {
+      res = await getComputadorasReservadas(lab, hora);
     }
     for (const item of res) {
       //console.log(item)
@@ -389,6 +388,38 @@ function miReserva2(usuario) {
   });
 }
 
+function getReservasAdminInfo(admin, tipo) {
+  var sql = '';
+  if (tipo == 1) {
+    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso")';
+  } else
+    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaLaboratorio r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso")';
+    return new Promise(resolve => {
+    mysqlConnection.query(sql, [admin], (err, rows, fields) => {
+      if (!err) {
+        resolve(rows);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+}
+
+function getReservasAdmin(admin, tipo) {
+ 
+  return new Promise(async function (resolve, reject) {
+    responseG={}
+    var info = await getReservasAdminInfo(admin, tipo);
+    responseG['comando'] = '/reservasAdmin';
+    responseG['ok'] = true;
+    responseG['tipo'] = tipo;
+    responseG['lab'] = admin;
+    responseG['info'] = info;
+    var res=JSON.stringify(responseG);
+    resolve(res);
+  });
+}
+
 module.exports.getLabs = getLabs;
 module.exports.getLibreLaboratorio = getLibreLaboratorio;
 module.exports.Labs = Labs;
@@ -409,5 +440,6 @@ module.exports.setComputadorasReservadas = setComputadorasReservadas;
 module.exports.reservaTimeOut = reservaTimeOut;
 module.exports.miReserva = miReserva;
 module.exports.miReserva2 = miReserva2;
-module.exports.getLaboratorioReservado=getLaboratorioReservado;
-module.exports.getComputadorasReservadas= getComputadorasReservadas;
+module.exports.getLaboratorioReservado = getLaboratorioReservado;
+module.exports.getComputadorasReservadas = getComputadorasReservadas;
+module.exports.getReservasAdmin = getReservasAdmin;

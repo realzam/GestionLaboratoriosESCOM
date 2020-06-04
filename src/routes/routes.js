@@ -138,14 +138,14 @@ router.post('/login', async (req, res) => {
   const { id, password } = req.body;
   console.log('login');
 
-  mysqlConnection.query('SELECT password,tipoUsuario FROM Usuario where id=?', [id, password], async (err, rows, fields) => {
+  mysqlConnection.query('SELECT password,tipoUsuario,laboratorio FROM Usuario where id=?', [id, password], async (err, rows, fields) => {
     if (rows.length < 1) {
       res.json({ error: "Usuario o Contraseña incorrecta" });
     } if (!err) {
       //console.log('rows',rows[0]['password'])
       const validPass = await helpers.matchPassword(password, rows[0]['password']);
       if (validPass)
-        res.json({ status: "ok", type: rows[0]['tipoUsuario'] });
+        res.json({ status: "ok", type: rows[0]['tipoUsuario'] ,lab:(rows[0]['tipoUsuario']==3)?rows[0]['laboratorio']:''  });
       else
         res.json({ error: "Usuario o Contraseña incorrecta" });
     } else {
@@ -213,7 +213,7 @@ router.post('/reservaComputadora', async (req, res) => {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
           await peticiones.modCompu(compu, lab, 'Reservada');
-        reservaContinue(type, hora, lab, fin, usuario)
+        reservaContinue(type, hora, lab, fin, usuario,1)
         res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
@@ -288,7 +288,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
           peticiones.modEdoLab(lab, 'Reservado')
           await peticiones.setComputadorasEdo('Ocupada', lab);
         }
-        reservaContinue(type, hora, lab, fin, usuario)
+        reservaContinue(type, hora, lab, fin, usuario,2)
         res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
@@ -302,16 +302,16 @@ router.post('/reservaLaboratorio', async (req, res) => {
 });
 
 
-function reservaContinue(type, hora, lab, fin, usuario) {
+function reservaContinue(type, hora, lab, fin, usuario,who) {
   if (type == 1) {
     utils.addTimerReserva(fin);
     updateSocket.sendUpdateComputadoras(lab);
     updateSocket.sendUpdateLabs();
-
   } else {
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
   updateSocket.sendUpdateReserva(usuario);
+  updateSocket.sendUpdateReservaAdmin(lab,who);
 }
 
 router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
@@ -337,8 +337,9 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
         updateSocket.sendUpdateLabs();
       } else
         updateSocket.sendUpdateComputadorasFuture(lab, hora);
-
-      updateSocket.sendUpdateReserva(usuario);
+      
+        updateSocket.sendUpdateReserva(usuario);
+        updateSocket.sendUpdateReservaAdmin(lab,1);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
@@ -370,6 +371,7 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
       } else
         updateSocket.sendUpdateComputadorasFuture(lab, hora);
 
+      updateSocket.sendUpdateReservaAdmin(lab,2);
       updateSocket.sendUpdateReserva(usuario);
       res.json({ status: "Reserva cancelada" });
     } else {
