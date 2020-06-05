@@ -403,7 +403,7 @@ router.post('/tokenNotification', async (req, res) => {
   });
 });
 
-router.post('/nextReserva', async (req, res) => {
+router.put('/nextReserva', async (req, res) => {
   const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario } = req.body;
   console.log('login');
   var sql;
@@ -412,9 +412,9 @@ router.post('/nextReserva', async (req, res) => {
     return 0;
   }
   if (tipoO == 1)
-    sql = "update  ReservaComputadora set estado=? fin=? where idUsuario=? and estado=?";
+    sql = "update  ReservaComputadora set estado=?, fin=? where idUsuario=? and estado=?";
   else
-    sql = "update  ReservaLaboratorio set estado=? fin=? where idUsuario=? and estado=?";
+    sql = "update  ReservaLaboratorio set estado=?, fin=? where idUsuario=? and estado=?";
   var nextEdo;
   var fin;
   if (estado == "En espera") {
@@ -449,8 +449,8 @@ router.post('/nextReserva', async (req, res) => {
     sql:sql,
     nextEdo:nextEdo,
     fin:fin.format(formato),
-    estado:estado,
-    usuario:usuario
+    usuario:usuario,
+    estado:estado
   });
   mysqlConnection.query(sql, [nextEdo, fin.format(formato), usuario, estado], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
