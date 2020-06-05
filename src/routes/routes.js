@@ -467,7 +467,7 @@ router.put('/nextReserva', async (req, res) => {
       }
       else
         msg='Reserva confirmada';
-      await updateSocket.sendReserva(usuario);
+      await updateSocket.sendUpdateReserva(usuario);
       updateSocket.sendUpdateReservaAdmin(lab, tipoUsuario);
       res.json({ status: true,message:msg });
     } else {
