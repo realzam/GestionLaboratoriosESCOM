@@ -374,8 +374,8 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
   mysqlConnection.query(query, [usuario], async (err, rows, fields) => {
     if (!err) {
       if (utils.getHoraID(momento.momento()) == hora) {
-        peticiones.setLaboratoriosEdo('Tiempo libre', 0);
-        await peticiones.setComputadorasEdo('Disponible', 0);
+        peticiones.modEdoLab(lab, 'Tiempo libre')
+        await peticiones.setComputadorasEdo('Disponible', lab);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
       } else
@@ -400,6 +400,8 @@ router.post('/hora', async (req, res) => {
   index.setHoraRoute();
   res.json({ fecha: momento.momento().format('YYYY-MM-DTHH:mm:ss.SSS') });
 });
+
+
 router.post('/tokenNotification', async (req, res) => {
   const { token, usuario } = req.body;//2020-05-19T12:09:00
   var query = 'INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ? and usuario = ?) LIMIT 1';
@@ -413,6 +415,7 @@ router.post('/tokenNotification', async (req, res) => {
     }
   });
 });
+
 
 router.put('/nextReserva', async (req, res) => {
   const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario,observaciones } = req.body;
@@ -483,8 +486,8 @@ router.put('/nextReserva', async (req, res) => {
       }
       
       else if (nextEdo == 'Finalizada' && tipoO == 2) {
-        peticiones.setLaboratoriosEdo('Tiempo libre', 0);
-        await peticiones.setComputadorasEdo('Disponible', 0);
+        peticiones.modEdoLab(lab, 'Tiempo libre')
+        await peticiones.setComputadorasEdo('Disponible', lab);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
         msg='Reserva Finalizada'
