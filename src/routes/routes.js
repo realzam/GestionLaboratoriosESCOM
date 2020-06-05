@@ -424,19 +424,25 @@ router.put('/nextReserva', async (req, res) => {
     var finH = hora;
     for (let i = 0; i < horas.length; i++) {
       const element = horas[i];
-      if (element['hora'] == hora && init == -1) {
-        init = hora;
-      } else if (init != -1) {
-        if (element['hora'] - init == 1)
-          init = element['hora'];
-        else {
-          finH = init
-          break;
+      if(init==-1)
+      {
+        if (element['hora'] == hora)
+        {
+          init=hora;
+          continue;
         }
-
+      }else{
+        if (element['hora'] - init == 1)
+        {
+          init=element['hora'];
+          continue;
+        }
+        finH = init
+        break;
       }
+    
     }
-    fin = utils.getDateFromID(finH).subtract(1, 'second');
+    fin = utils.getDateFromID(finH+1).subtract(1, 'second');
     utils.addTimerReserva(fin);
   }
 
