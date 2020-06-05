@@ -437,7 +437,7 @@ router.post('/nextReserva', async (req, res) => {
       }
     }
     fin = utils.getDateFromID(finH).subtract(1, 'second');
-    utils.addTimerReserva(finH);
+    utils.addTimerReserva(fin);
   }
 
   else if (estado == "En uso") {
