@@ -471,10 +471,10 @@ router.put('/nextReserva', async (req, res) => {
       }
 
       updateSocket.sendUpdateReservaAdmin(lab, tipoUsuario);
-      res.json({ status: ok,message:'Modificacion compeltada' });
+      res.json({ status: true,message:'Modificacion compeltada' });
     } else {
       console.log(err);
-      res.json({ error: "ups hubo algun error :(" });
+      res.json({ status:false, message: "ups hubo algun error :(" });
     }
   });
 });
