@@ -399,13 +399,32 @@ function miReserva2(usuario) {
 function getReservasAdminInfo(admin, tipo) {
   var sql = '';
   if (tipo == 1) {
-    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and u.tipoUsuario=1 and(r.estado="En espera" or r.estado="En uso") order by r.hora';
+    sql = 'select u.tipoUsuario as tipo_usuario, r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and u.tipoUsuario=1 and(r.estado="En espera" or r.estado="En uso") order by r.hora';
   } else
-    sql = 'select r.idUsuario as id_usuario,u.nombre, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaLaboratorio r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso") order by r.hora';
+    sql = 'select u.tipoUsuario as tipo_usuario, r.idUsuario as id_usuario,u.nombre, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaLaboratorio r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and(r.estado="En espera" or r.estado="En uso") order by r.hora';
     return new Promise(resolve => {
     mysqlConnection.query(sql, [admin], (err, rows, fields) => {
       if (!err) {
-        resolve(rows);
+        if(tipo==1)
+        {
+          resolve(rows);
+          return 0;
+        }else{
+          var tem=rows;
+          sql2 = 'select u.tipoUsuario as tipo_usuario, r.idUsuario as id_usuario,u.nombre, r.idComputadora as id_computadora, r.idLaboratorio as id_laboratorio,r.inicio,r.dia,r.hora,r.fin,r.estado from ReservaComputadora r,Usuario u where r.idLaboratorio=? and u.id=r.idUsuario and u.tipoUsuario=2 and(r.estado="En espera" or r.estado="En uso") order by r.hora';
+          mysqlConnection.query(sql2, [admin], (err2, rows2, fields2) => {
+            if(!err2)
+              {
+                const fin = tem.concat(rows2);
+                console.log(fin);
+                resolve(fin)
+              }else
+              {
+                console.log(err2);
+              }
+          });
+        }
+
       } else {
         console.log(err);
       }

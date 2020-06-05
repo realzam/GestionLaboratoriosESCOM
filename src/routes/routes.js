@@ -137,7 +137,6 @@ router.post('/add/usuario/:type', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { id, password } = req.body;
   console.log('login');
-
   mysqlConnection.query('SELECT password,tipoUsuario,laboratorio FROM Usuario where id=?', [id, password], async (err, rows, fields) => {
     if (rows.length < 1) {
       res.json({ error: "Usuario o Contraseña incorrecta" });
@@ -145,7 +144,7 @@ router.post('/login', async (req, res) => {
       //console.log('rows',rows[0]['password'])
       const validPass = await helpers.matchPassword(password, rows[0]['password']);
       if (validPass)
-        res.json({ status: "ok", type: rows[0]['tipoUsuario'] ,lab:(rows[0]['tipoUsuario']==3)?rows[0]['laboratorio']:''  });
+        res.json({ status: "ok", type: rows[0]['tipoUsuario'], lab: (rows[0]['tipoUsuario'] == 3) ? rows[0]['laboratorio'] : '' });
       else
         res.json({ error: "Usuario o Contraseña incorrecta" });
     } else {
@@ -213,7 +212,7 @@ router.post('/reservaComputadora', async (req, res) => {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
           await peticiones.modCompu(compu, lab, 'Reservada');
-        reservaContinue(type, hora, lab, fin, usuario,1)
+        reservaContinue(type, hora, lab, fin, usuario, 1)
         res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
@@ -288,7 +287,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
           peticiones.modEdoLab(lab, 'Reservado')
           await peticiones.setComputadorasEdo('Ocupada', lab);
         }
-        reservaContinue(type, hora, lab, fin, usuario,2)
+        reservaContinue(type, hora, lab, fin, usuario, 2)
         res.json({ message: "Reserva hecha", status: 0, type: type });
       }
       else
@@ -302,7 +301,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
 });
 
 
-function reservaContinue(type, hora, lab, fin, usuario,who) {
+function reservaContinue(type, hora, lab, fin, usuario, who) {
   if (type == 1) {
     utils.addTimerReserva(fin);
     updateSocket.sendUpdateComputadoras(lab);
@@ -311,7 +310,7 @@ function reservaContinue(type, hora, lab, fin, usuario,who) {
     updateSocket.sendUpdateComputadorasFuture(lab, hora);
   }
   updateSocket.sendUpdateReserva(usuario);
-  updateSocket.sendUpdateReservaAdmin(lab,who);
+  updateSocket.sendUpdateReservaAdmin(lab, who);
 }
 
 router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
@@ -337,9 +336,9 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
         updateSocket.sendUpdateLabs();
       } else
         updateSocket.sendUpdateComputadorasFuture(lab, hora);
-      
-        updateSocket.sendUpdateReserva(usuario);
-        updateSocket.sendUpdateReservaAdmin(lab,1);
+
+      updateSocket.sendUpdateReserva(usuario);
+      updateSocket.sendUpdateReservaAdmin(lab, 1);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
@@ -371,7 +370,7 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
       } else
         updateSocket.sendUpdateComputadorasFuture(lab, hora);
 
-      updateSocket.sendUpdateReservaAdmin(lab,2);
+      updateSocket.sendUpdateReservaAdmin(lab, 2);
       updateSocket.sendUpdateReserva(usuario);
       res.json({ status: "Reserva cancelada" });
     } else {
@@ -393,13 +392,82 @@ router.post('/hora', async (req, res) => {
 router.post('/tokenNotification', async (req, res) => {
   const { token, usuario } = req.body;//2020-05-19T12:09:00
   var query = 'INSERT INTO TokenNotification(idToken, usuario) SELECT * FROM (SELECT ? AS token, ? AS usuario) AS tmp WHERE NOT EXISTS (SELECT idToken FROM TokenNotification WHERE idToken = ? and usuario = ?) LIMIT 1';
-  mysqlConnection.query(query, [token, usuario, token,usuario], async (err, rows, fields) => {
+  mysqlConnection.query(query, [token, usuario, token, usuario], async (err, rows, fields) => {
     if (!err) {
       res.json({ status: true });
 
     } else {
       console.log(err);
       res.json({ status: false });
+    }
+  });
+});
+
+router.post('/nextReserva', async (req, res) => {
+  const { usuario, tipo, estado, hora, lab, computadora, tipoUsuario } = req.body;
+  console.log('login');
+  var sql;
+  if (hora < utils.getHoraID(momento.momento())) {
+    res.json({ status: false, message: 'Aun no es tiempo' });
+    return 0;
+  }
+  if (tipo == 1)
+    sql = "update  ReservaComputadora set estado=? fin=? where idUsuario=? and estado=?'";
+  else
+    sql = "update  ReservaLaboratorio set estado=? fin=? where idUsuario=? and estado=?'";
+  var nextEdo;
+  var fin;
+  if (estado == "En espera") {
+    nextEdo = "En uso";
+    var horas = await getHorasLibres(lab, momento.momento().day())
+    var init = -1
+    var finH = hora;
+    for (let i = 0; i < horas.length; i++) {
+      const element = horas[i];
+      if (element['hora'] == hora && init == -1) {
+        init = hora;
+      } else if (init != -1) {
+        if (element['hora'] - init == 1)
+          init = element['hora'];
+        else {
+          finH = init
+          break;
+        }
+
+      }
+    }
+    fin = utils.getDateFromID(finH).subtract(1, 'second');
+    utils.addTimerReserva(finH);
+  }
+
+  else if (estado == "En uso") {
+    nextEdo = "Finalizada"
+    fin = momento.momento()
+  }
+
+  mysqlConnection.query(sql, [estado, fin, usuario, nextEdo], async (err, rows, fields) => {
+    if (rows['changedRows'] < 1) {
+      res.json({ error: "Reserva no encontrada" });
+
+    } if (!err) {
+      if (nextEdo == 'Finalizada' && tipo == 1) {
+        await peticiones.modCompu(computadora, lab, 'Disponible')
+        updateSocket.sendUpdateComputadoras(lab);
+        updateSocket.sendUpdateLabs();
+      }
+
+      if (nextEdo == 'Finalizada' && tipo == 2) {
+        peticiones.setLaboratoriosEdo('Tiempo libre', 0);
+        await peticiones.setComputadorasEdo('Disponible', 0);
+        updateSocket.sendUpdateComputadoras(lab);
+        updateSocket.sendUpdateLabs();
+      }
+
+      updateSocket.sendUpdateReservaAdmin(lab, tipoUsuario);
+      res.json({ status: ok,message:'Modificacion compeltada' });
+    } else {
+      console.log(err);
+      res.json({ error: "ups hubo algun error :(" });
     }
   });
 });
