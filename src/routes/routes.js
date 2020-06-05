@@ -445,33 +445,31 @@ router.put('/nextReserva', async (req, res) => {
     fin = momento.momento()
   }
   var formato = 'YYYY-MM-DD HH:mm:ss';
-  console.table({
-    sql:sql,
-    nextEdo:nextEdo,
-    fin:fin.format(formato),
-    usuario:usuario,
-    estado:estado
-  });
   mysqlConnection.query(sql, [nextEdo, fin.format(formato), usuario, estado], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
       res.json({ error: "Reserva no encontrada" });
 
     } if (!err) {
-      if (nextEdo == 'Finalizada' && tipo == 1) {
+      var msg;
+      if (nextEdo == 'Finalizada' && tipoO == 1) {
         await peticiones.modCompu(computadora, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
+        msg='Reserva Finalizada'
       }
-
-      if (nextEdo == 'Finalizada' && tipo == 2) {
+      
+      else if (nextEdo == 'Finalizada' && tipoO == 2) {
         peticiones.setLaboratoriosEdo('Tiempo libre', 0);
         await peticiones.setComputadorasEdo('Disponible', 0);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
+        msg='Reserva Finalizada'
       }
-
+      else
+        msg='Reserva confirmada';
+      await updateSocket.sendReserva(usuario);
       updateSocket.sendUpdateReservaAdmin(lab, tipoUsuario);
-      res.json({ status: true,message:'Modificacion compeltada' });
+      res.json({ status: true,message:msg });
     } else {
       console.log(err);
       res.json({ status:false, message: "ups hubo algun error :(" });
