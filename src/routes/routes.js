@@ -404,14 +404,14 @@ router.post('/tokenNotification', async (req, res) => {
 });
 
 router.post('/nextReserva', async (req, res) => {
-  const { usuario, tipo, estado, hora, lab, computadora, tipoUsuario } = req.body;
+  const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario } = req.body;
   console.log('login');
   var sql;
   if (hora < utils.getHoraID(momento.momento())) {
     res.json({ status: false, message: 'Aun no es tiempo' });
     return 0;
   }
-  if (tipo == 1)
+  if (tipoO == 1)
     sql = "update  ReservaComputadora set estado=? fin=? where idUsuario=? and estado=?'";
   else
     sql = "update  ReservaLaboratorio set estado=? fin=? where idUsuario=? and estado=?'";
@@ -419,7 +419,7 @@ router.post('/nextReserva', async (req, res) => {
   var fin;
   if (estado == "En espera") {
     nextEdo = "En uso";
-    var horas = await getHorasLibres(lab, momento.momento().day())
+    var horas = await peticiones.getHorasLibres(lab, momento.momento().day())
     var init = -1
     var finH = hora;
     for (let i = 0; i < horas.length; i++) {
