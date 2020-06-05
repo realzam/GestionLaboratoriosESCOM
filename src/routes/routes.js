@@ -189,7 +189,7 @@ router.post('/reservaComputadora', async (req, res) => {
   }
   var edo = "En espera"
   //const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
-  const query = "INSERT INTO ReservaComputadora () SELECT * FROM (SELECT ?,? AS idComputadora,?,?,? AS dia,? As hora,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idComputadora = ? and idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
+  const query = "INSERT INTO ReservaComputadora () SELECT * FROM (SELECT ?,? AS idComputadora,?,?,? AS dia,? As hora,?,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idComputadora = ? and idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
   var inicio = momento.momento();
   var formato = 'YYYY-MM-DD HH:mm:ss';
   var dia = momento.momento().day()
@@ -218,7 +218,7 @@ router.post('/reservaComputadora', async (req, res) => {
     }
     
   }
-  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo,'Sin Observaciones', compu, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
@@ -262,7 +262,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
   const { usuario, lab, hora } = req.body;
   var edo = "En espera"
   //const query ="insert into ReservaComputadora() values(?,?,?,?,?,?,?,?)"
-  const query = "INSERT INTO ReservaLaboratorio () SELECT * FROM (SELECT ?,?,?,? AS dia,? As hora,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
+  const query = "INSERT INTO ReservaLaboratorio () SELECT * FROM (SELECT ?,?,?,? AS dia,? As hora,?,?,?) AS tmp WHERE NOT EXISTS ( SELECT * FROM ReservaComputadora WHERE idLaboratorio=? and dia=? and hora=? and estado=?) LIMIT 1;"
   var inicio = momento.momento();
   var formato = 'YYYY-MM-DD HH:mm:ss';
   var dia = momento.momento().day()
@@ -290,7 +290,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
   }
   var reservasCancel = await peticiones.getComputadorasReservadas(lab, hora)
   await canelarReserva(reservasCancel);
-  mysqlConnection.query(query, [usuario, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, lab, dia, hora, edo], async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, lab, inicio.format(formato), dia, hora, fin.format(formato), edo,'Sin Observaciones', lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] > 0) {
         console.log('affectedRows', rows['affectedRows'])
