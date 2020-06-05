@@ -206,7 +206,18 @@ router.post('/reservaComputadora', async (req, res) => {
     res.json({ message: "Ya tienes un reserva", status: 2 });
     return 0
   }
-
+  var after = await peticiones.getComputadorasReservadas(lab, hora);
+  if (after.length > 0) {
+    for (var i=0;i<after.length;i++) {
+      var element=after[i]
+      if(element['idComputadora']=compu)
+      {
+        res.json({ message: "Computadora  no esta diponible", status: 2 });
+        return 0;
+      }
+    }
+    
+  }
   mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, compu, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {

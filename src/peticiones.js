@@ -306,7 +306,7 @@ const forLoop2 = async (hora, dia) => {
 
 function getLaboratorioReservado(lab, hora) {
   return new Promise(resolve => {
-    mysqlConnection.query('select *  from ReservaLaboratorio where idLaboratorio=? and hora=? and estado=?', [lab, hora, "En espera"], (err, rows, fields) => {
+    mysqlConnection.query('select *  from ReservaLaboratorio where idLaboratorio=? and hora=? and (estado="En espera" or estado="En uso")', [lab, hora], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
@@ -317,7 +317,7 @@ function getLaboratorioReservado(lab, hora) {
 }
 function getComputadorasReservadas(lab, hora) {
   return new Promise(resolve => {
-    mysqlConnection.query('select * from ReservaComputadora where idLaboratorio=? and hora=? and estado="En espera" order by idComputadora', [lab, hora], (err, rows, fields) => {
+    mysqlConnection.query('select * from ReservaComputadora where idLaboratorio=? and hora=? and  (estado="En espera" or estado="En uso") order by idComputadora', [lab, hora], (err, rows, fields) => {
       if (!err) {
         resolve(rows)
       } else {
