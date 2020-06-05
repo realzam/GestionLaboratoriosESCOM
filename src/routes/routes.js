@@ -444,8 +444,15 @@ router.post('/nextReserva', async (req, res) => {
     nextEdo = "Finalizada"
     fin = momento.momento()
   }
-
-  mysqlConnection.query(sql, [estado, fin, usuario, nextEdo], async (err, rows, fields) => {
+  var formato = 'YYYY-MM-DD HH:mm:ss';
+  console.table({
+    sql:sql,
+    estado:estado,
+    fin:fin.format(formato),
+    usuario:usuario,
+    nextEdo:nextEdo
+  });
+  mysqlConnection.query(sql, [estado, fin.format(formato), usuario, nextEdo], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
       res.json({ error: "Reserva no encontrada" });
 
