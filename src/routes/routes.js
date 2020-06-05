@@ -415,7 +415,14 @@ router.post('/tokenNotification', async (req, res) => {
 });
 
 router.put('/nextReserva', async (req, res) => {
-  const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario } = req.body;
+  const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario,observaciones } = req.body;
+  var observacionesF='';
+  if(observaciones==null || observaciones=='')
+  {
+    observacionesF='Sin Observaciones';
+  }
+  else
+  observacionesF=observaciones;
   console.log('login');
   var sql;
   if (hora < utils.getHoraID(momento.momento())) {
@@ -423,9 +430,9 @@ router.put('/nextReserva', async (req, res) => {
     return 0;
   }
   if (tipoO == 1)
-    sql = "update  ReservaComputadora set estado=?, fin=? where idUsuario=? and estado=?";
+    sql = "update  ReservaComputadora set estado=?, fin=? ,observaciones=? where idUsuario=? and estado=?";
   else
-    sql = "update  ReservaLaboratorio set estado=?, fin=? where idUsuario=? and estado=?";
+    sql = "update  ReservaLaboratorio set estado=?, fin=? ,observaciones=? where idUsuario=? and estado=?";
   var nextEdo;
   var fin;
   if (estado == "En espera") {
@@ -462,7 +469,7 @@ router.put('/nextReserva', async (req, res) => {
     fin = momento.momento()
   }
   var formato = 'YYYY-MM-DD HH:mm:ss';
-  mysqlConnection.query(sql, [nextEdo, fin.format(formato), usuario, estado], async (err, rows, fields) => {
+  mysqlConnection.query(sql, [nextEdo, fin.format(formato),observacionesF, usuario, estado], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
       res.json({ error: "Reserva no encontrada" });
 
