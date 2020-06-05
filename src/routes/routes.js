@@ -412,9 +412,9 @@ router.post('/nextReserva', async (req, res) => {
     return 0;
   }
   if (tipoO == 1)
-    sql = "update  ReservaComputadora set estado=? fin=? where idUsuario=? and estado=?'";
+    sql = "update  ReservaComputadora set estado=? fin=? where idUsuario=? and estado=?";
   else
-    sql = "update  ReservaLaboratorio set estado=? fin=? where idUsuario=? and estado=?'";
+    sql = "update  ReservaLaboratorio set estado=? fin=? where idUsuario=? and estado=?";
   var nextEdo;
   var fin;
   if (estado == "En espera") {
@@ -447,12 +447,12 @@ router.post('/nextReserva', async (req, res) => {
   var formato = 'YYYY-MM-DD HH:mm:ss';
   console.table({
     sql:sql,
-    estado:estado,
+    nextEdo:nextEdo,
     fin:fin.format(formato),
-    usuario:usuario,
-    nextEdo:nextEdo
+    estado:estado,
+    usuario:usuario
   });
-  mysqlConnection.query(sql, [estado, fin.format(formato), usuario, nextEdo], async (err, rows, fields) => {
+  mysqlConnection.query(sql, [nextEdo, fin.format(formato), usuario, estado], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
       res.json({ error: "Reserva no encontrada" });
 
