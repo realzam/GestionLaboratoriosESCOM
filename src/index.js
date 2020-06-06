@@ -251,7 +251,7 @@ io.on('connection', ws => {
               responseG['mesage'] = 'laboratorio desconocido';
               res = JSON.stringify(responseG);
             } else
-              res = await peticiones.getReservasReportesComputadorasInfo(ws.laboratorio, parseInt(s[2]));
+              res = await peticiones.getReservasReportesInfo(ws.laboratorio, parseInt(s[2]),parseInt(s[3]));
           }
           para=ws.laboratorio;
           break;

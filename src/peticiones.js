@@ -477,16 +477,16 @@ function getReporteLaboratorioInfo(lab, inicio,fin) {
 }
 
 
-function getReservasReportesInfo(lab, opc,tipo) {
+function getReservasReportesInfo(lab, time,tipo) {
   return new Promise(async function (resolve, reject) {
   var inicio = '';
   var fin = '';
   var a = momento.momento().clone();
-  if (opc == 1)//dia
+  if (time == 1)//dia
   {
     inicio = utils.setHora(a, 0, 0, 0).format('YYYY-MM-DD');
     fin = utils.setHora(a.add(1,'day'), 0, 0, 0).format('YYYY-MM-DD');
-  } else if (opc == 2)//semana
+  } else if (time == 2)//semana
   {
     var b = a.clone().day(1)
     inicio = utils.setHora(b, 0, 0, 0).format('YYYY-MM-DD');
@@ -507,10 +507,6 @@ function getReservasReportesInfo(lab, opc,tipo) {
     inicio = utils.setHora(b, 0, 0, 0).format('YYYY-MM-DD');
     fin = utils.setHora(c.add(1,'day'), 0, 0, 0, 23, 59, 59).format('YYYY-MM-DD');
   }
-  console.table({
-    inicio,
-    fin
-  })
   if(tipo==1)
   var info = await getReporteComputadoraInfo(lab,inicio,fin)
   else
@@ -519,6 +515,7 @@ function getReservasReportesInfo(lab, opc,tipo) {
   let responseG={}
   responseG['comando'] = '/reservasReportes';
   responseG['ok'] = true;
+  responseG['time'] = time;
   responseG['tipo'] = tipo;
   responseG['lab'] = lab;
   responseG['info'] = info;
