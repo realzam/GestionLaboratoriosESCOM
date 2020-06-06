@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
-app.use("/public",express.static(path.join(__dirname, 'public')));
+app.use("/public", express.static(path.join(__dirname, 'public')));
 //global varibles
 var timeOutReserva;
 var timeOutSheduling;
@@ -197,22 +197,21 @@ io.on('connection', ws => {
         case 'id':
           var responseG = {}  // /id/usuarioID/{lab}
           ws.idCliente = s[2];
-          if (s[3] == null)
-          {
+          if (s[3] == null) {
             ws.laboratorio = null;
             responseG['info'] = "bienvendio " + s[2];
           }
           else {
             try {
               ws.laboratorio = parseInt(s[3]);
-              responseG['info'] = "bienvendio " + s[2]+' del laboratorio '+s[3];
+              responseG['info'] = "bienvendio " + s[2] + ' del laboratorio ' + s[3];
             } catch (e) {
               console.log(e);
               ws.laboratorio = null;
               responseG['info'] = "bienvendio " + s[2];
             }
           }
-         
+
           res = JSON.stringify(responseG);
           para = ws.idCliente;
           break;
@@ -231,10 +230,30 @@ io.on('connection', ws => {
               responseG['ok'] = false;
               responseG['mesage'] = 'laboratorio desconocido';
               res = JSON.stringify(responseG);
-            }else
-              res = await peticiones.getReservasAdmin(ws.laboratorio,parseInt(s[2]));
+            } else
+              res = await peticiones.getReservasAdmin(ws.laboratorio, parseInt(s[2]));
           }
-
+          para=ws.laboratorio;
+          break;
+          case 'reservasReportes':
+          if (ws.laboratorio == null) {
+            var responseG = {}
+            responseG['comando'] = '/reservasReportes';
+            responseG['ok'] = false;
+            responseG['mesage'] = 'laboratorio nulo';
+            res = JSON.stringify(responseG);
+          }
+          else {
+            if (global.labslist.indexOf(ws.laboratorio) == -1) {
+              var responseG = {}
+              responseG['comando'] = '/reservasReportes';
+              responseG['ok'] = false;
+              responseG['mesage'] = 'laboratorio desconocido';
+              res = JSON.stringify(responseG);
+            } else
+              res = await peticiones.getReservasReportesComputadorasInfo(ws.laboratorio, parseInt(s[2]));
+          }
+          para=ws.laboratorio;
           break;
         default:
           var responseG = {}
@@ -286,7 +305,7 @@ function sendAll(message, yo, to) {
 
       if (CLIENTS[i] != yo) {
         if (to != null) {
-          if (CLIENTS[i].idCliente == to ||CLIENTS[i].laboratorio==to)
+          if (CLIENTS[i].idCliente == to || CLIENTS[i].laboratorio == to)
             CLIENTS[i].send(message);
           continue;
         }

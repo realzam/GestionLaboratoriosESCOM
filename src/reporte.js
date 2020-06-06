@@ -1,28 +1,17 @@
 //Required package
 var pdf = require("pdf-creator-node")
 var fs = require('fs')
-const mysqlConnection = require('./database.js');
-const path = require('path');
 
+const path = require('path');
+const peticiones = require('./peticiones.js');
 var options = { height: "11.7in",width: "16.5in", orientation: "portrait", border: "10mm" };
 
-function getReporteComputadoraInfo(lab, fecha) {
-  return new Promise(async function (resolve, reject) {
-    mysqlConnection.query('SELECT ReservaComputadora.idUsuario, ReservaComputadora.idComputadora as Computadora, DATE_FORMAT(ReservaComputadora.fin,"%d-%m-%Y") as dia, DATE_FORMAT(ReservaComputadora.fin,"%H:%i") as hora, ReservaComputadora.estado as Estado, ReservaComputadora.observaciones as observacion,Usuario.nombre as Nombre from ReservaComputadora left JOIN Usuario on ReservaComputadora.idUsuario=Usuario.id where ReservaComputadora.idLaboratorio=? and ReservaComputadora.fin>=?', [lab, fecha], (err, rows, fields) => {
-      if (!err) {
-        resolve(rows);
-      } else {
-        console.log(err);
-        reject(err)
-      }
-    });
-  });
-}
 
-async function getReporteComputadora(lab, fecha) {
+
+async function getReporteComputadora(lab,  inicio,fin) {
   return new Promise(async function (resolve, reject) {
     var reservas = []
-    let res = await getReporteComputadoraInfo(lab, fecha);
+    let res = await peticiones.getReporteComputadoraInfo(lab,  inicio,fin);
     for (const item of res) {
       reservas.push(item)
     }
@@ -49,25 +38,13 @@ async function getReporteComputadora(lab, fecha) {
 }
 
 
-function getReporteLaboratorioInfo(lab, fecha) {
-  return new Promise(async function (resolve, reject) {
-    mysqlConnection.query('SELECT ReservaLaboratorio.idUsuario, DATE_FORMAT(ReservaLaboratorio.fin,"%d-%m-%Y") as dia, DATE_FORMAT(ReservaLaboratorio.fin,"%H:%i") as hora, ReservaLaboratorio.estado as Estado, ReservaLaboratorio.observaciones as observacion,Usuario.nombre as Nombre from ReservaLaboratorio left JOIN Usuario on ReservaLaboratorio.idUsuario=Usuario.id where ReservaLaboratorio.idLaboratorio=? and ReservaLaboratorio.fin>=?', [lab, fecha], (err, rows, fields) => {
-      if (!err) {
-        console.log('rows',rows)
-        resolve(rows);
-      } else {
-        console.log(err);
-        reject(err)
-      }
-    });
-  });
-}
 
-function getReporteLaboratorio(lab, fecha) {
+
+function getReporteLaboratorio(lab, inicio,fin) {
   var reservas = []
   return new Promise(async function (resolve, reject) {
 
-    let res = await getReporteLaboratorioInfo(lab, fecha);
+    let res = await peticiones.getReporteLaboratorioInfo(lab, inicio,fin);
     for (const item of res) {
       reservas.push(item)
     }

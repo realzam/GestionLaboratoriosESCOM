@@ -30,6 +30,12 @@ async function sendUpdateReservaAdmin(lab,tipo) {
   index.sendAll(hora, null, null);
 }
 
+async function sendUpdateReservaReportes(lab,tipo) {
+  console.log('sendUpdateReservaReportes',lab,tipo)
+  var res = await peticiones.getReservasReportesInfo(lab,tipo)
+  index.sendAll(res, null, lab)
+}
+
 function sendServerDate() {
   return new Promise(resolve => {
     var responseG = {};
@@ -75,3 +81,4 @@ module.exports.sendUpdateComputadorasFuture = sendUpdateComputadorasFuture;
 module.exports.sendReserva = sendReserva;
 module.exports.sendUpdateReserva = sendUpdateReserva;
 module.exports.sendUpdateReservaAdmin=sendUpdateReservaAdmin;
+module.exports.sendUpdateReservaReportes=sendUpdateReservaReportes;

@@ -2,6 +2,7 @@ var request = require('request');
 const momento = require('./momento.js');
 const mysqlConnection = require('./database.js');
 const updateSocket = require('./sendUpdateSockets.js');
+const utils = require('./utils.js');
 function Labs() {
   return new Promise(async function (resolve, reject) {
     //var sql='SELECT l.idLaboratorio as id_laboratorio,l.estado,(select count(*) from Computadora c where c.idLaboratorio = l.idLaboratorio and c.estado="Disponible") as disponibles FROM Laboratorio l WHERE l.idLaboratorio in (1105,1106,1107,2103)'
@@ -447,6 +448,86 @@ function getReservasAdmin(admin, tipo) {
   });
 }
 
+
+function getReporteComputadoraInfo(lab, inicio,fin) {
+  return new Promise(async function (resolve, reject) {
+    mysqlConnection.query('SELECT ReservaComputadora.idUsuario, ReservaComputadora.idComputadora as Computadora, DATE_FORMAT(ReservaComputadora.fin,"%d-%m-%Y") as dia, DATE_FORMAT(ReservaComputadora.fin,"%H:%i") as hora, ReservaComputadora.estado as Estado, ReservaComputadora.observaciones as observacion,Usuario.nombre as Nombre from ReservaComputadora left JOIN Usuario on ReservaComputadora.idUsuario=Usuario.id where ReservaComputadora.idLaboratorio=? and ReservaComputadora.fin between ? and ?', [lab, inicio,fin], (err, rows, fields) => {
+      if (!err) {
+        resolve(rows);
+      } else {
+        console.log(err);
+        reject(err)
+      }
+    });
+  });
+}
+
+function getReporteLaboratorioInfo(lab, inicio,fin) {
+  return new Promise(async function (resolve, reject) {
+    mysqlConnection.query('SELECT ReservaLaboratorio.idUsuario, DATE_FORMAT(ReservaLaboratorio.fin,"%d-%m-%Y") as dia, DATE_FORMAT(ReservaLaboratorio.fin,"%H:%i") as hora, ReservaLaboratorio.estado as Estado, ReservaLaboratorio.observaciones as observacion,Usuario.nombre as Nombre from ReservaLaboratorio left JOIN Usuario on ReservaLaboratorio.idUsuario=Usuario.id where ReservaLaboratorio.idLaboratorio=? and ReservaLaboratorio.fin between ? and ?', [lab, inicio,fin], (err, rows, fields) => {
+      if (!err) {
+        console.log('rows',rows)
+        resolve(rows);
+      } else {
+        console.log(err);
+        reject(err)
+      }
+    });
+  });
+}
+
+
+function getReservasReportesInfo(lab, opc,tipo) {
+  return new Promise(async function (resolve, reject) {
+  var inicio = '';
+  var fin = '';
+  var a = momento.momento().clone();
+  if (opc == 1)//dia
+  {
+    inicio = utils.setHora(a, 0, 0, 0).format('YYYY-MM-DD');
+    fin = utils.setHora(a.add(1,'day'), 0, 0, 0).format('YYYY-MM-DD');
+  } else if (opc == 2)//semana
+  {
+    var b = a.clone().day(1)
+    inicio = utils.setHora(b, 0, 0, 0).format('YYYY-MM-DD');
+    var c = a.clone().day(6)
+    fin = utils.setHora(c, 0, 0, 0).format('YYYY-MM-DD');
+  } else//mes
+  {
+    var b = a.clone().date(1);
+    if (a.clone().date(31).month() == a.clone().month())
+      var c = a.clone().date(31);
+    else if (a.clone().date(30).month() == a.clone().month())
+      var c = a.clone().date(30);
+    else if (a.clone().date(29).month() == a.clone().month())
+      var c = a.clone().date(29);
+    else if (a.clone().date(28).month() == a.clone().month())
+      var c = a.clone().date(28);
+
+    inicio = utils.setHora(b, 0, 0, 0).format('YYYY-MM-DD');
+    fin = utils.setHora(c.add(1,'day'), 0, 0, 0, 23, 59, 59).format('YYYY-MM-DD');
+  }
+  console.table({
+    inicio,
+    fin
+  })
+  if(tipo==1)
+  var info = await getReporteComputadoraInfo(lab,inicio,fin)
+  else
+  var info = await getReporteLaboratorioInfo(lab,inicio,fin)
+
+  let responseG={}
+  responseG['comando'] = '/reservasReportes';
+  responseG['ok'] = true;
+  responseG['tipo'] = tipo;
+  responseG['lab'] = lab;
+  responseG['info'] = info;
+  var res=JSON.stringify(responseG);
+  resolve(res)
+});
+}
+
+
 module.exports.getLabs = getLabs;
 module.exports.getLibreLaboratorio = getLibreLaboratorio;
 module.exports.Labs = Labs;
@@ -470,3 +551,8 @@ module.exports.miReserva2 = miReserva2;
 module.exports.getLaboratorioReservado = getLaboratorioReservado;
 module.exports.getComputadorasReservadas = getComputadorasReservadas;
 module.exports.getReservasAdmin = getReservasAdmin;
+
+module.exports.getReporteComputadoraInfo=getReporteComputadoraInfo;
+module.exports.getReporteLaboratorioInfo=getReporteLaboratorioInfo;
+
+module.exports.getReservasReportesInfo=getReservasReportesInfo;

@@ -208,17 +208,16 @@ router.post('/reservaComputadora', async (req, res) => {
   }
   var after = await peticiones.getComputadorasReservadas(lab, hora);
   if (after.length > 0) {
-    for (var i=0;i<after.length;i++) {
-      var element=after[i]
-      if(element['idComputadora']=compu)
-      {
+    for (var i = 0; i < after.length; i++) {
+      var element = after[i]
+      if (element['idComputadora'] = compu) {
         res.json({ message: "Computadora  no esta diponible", status: 2 });
         return 0;
       }
     }
-    
+
   }
-  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo,'Sin Observaciones', compu, lab, dia, hora, edo], async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, compu, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, 'Sin observaciones', compu, lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] == 1) {
         if (type == 1)
@@ -290,7 +289,7 @@ router.post('/reservaLaboratorio', async (req, res) => {
   }
   var reservasCancel = await peticiones.getComputadorasReservadas(lab, hora)
   await canelarReserva(reservasCancel);
-  mysqlConnection.query(query, [usuario, lab, inicio.format(formato), dia, hora, fin.format(formato), edo,'Sin Observaciones', lab, dia, hora, edo], async (err, rows, fields) => {
+  mysqlConnection.query(query, [usuario, lab, inicio.format(formato), dia, hora, fin.format(formato), edo, 'Sin observaciones', lab, dia, hora, edo], async (err, rows, fields) => {
     if (!err) {
       if (rows['affectedRows'] > 0) {
         console.log('affectedRows', rows['affectedRows'])
@@ -322,6 +321,7 @@ function reservaContinue(type, hora, lab, fin, usuario, who) {
   }
   updateSocket.sendUpdateReserva(usuario);
   updateSocket.sendUpdateReservaAdmin(lab, who);
+  updateSocket.sendUpdateReservaReportes(lab,who);
 }
 
 router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
@@ -350,6 +350,7 @@ router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
 
       updateSocket.sendUpdateReserva(usuario);
       updateSocket.sendUpdateReservaAdmin(lab, 1);
+      updateSocket.sendUpdateReservaReportes(lab, 1);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
@@ -381,8 +382,9 @@ router.put('/cancelarReserva/laboratorio/:usuario', async (req, res) => {
       } else
         updateSocket.sendUpdateComputadorasFuture(lab, hora);
 
-      updateSocket.sendUpdateReservaAdmin(lab, 2);
       updateSocket.sendUpdateReserva(usuario);
+      updateSocket.sendUpdateReservaAdmin(lab, 2);
+      updateSocket.sendUpdateReservaReportes(lab, 2);
       res.json({ status: "Reserva cancelada" });
     } else {
       console.log(err);
@@ -418,14 +420,13 @@ router.post('/tokenNotification', async (req, res) => {
 
 
 router.put('/nextReserva', async (req, res) => {
-  const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario,observaciones } = req.body;
-  var observacionesF='';
-  if(observaciones==null || observaciones=='')
-  {
-    observacionesF='Sin Observaciones';
+  const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario, observaciones } = req.body;
+  var observacionesF = '';
+  if (observaciones == null || observaciones == '') {
+    observacionesF = 'Sin observaciones';
   }
   else
-  observacionesF=observaciones;
+    observacionesF = observaciones;
   console.log('login');
   var sql;
   if (hora > utils.getHoraID(momento.momento())) {
@@ -445,25 +446,22 @@ router.put('/nextReserva', async (req, res) => {
     var finH = hora;
     for (let i = 0; i < horas.length; i++) {
       const element = horas[i];
-      if(init==-1)
-      {
-        if (element['hora'] == hora)
-        {
-          init=hora;
+      if (init == -1) {
+        if (element['hora'] == hora) {
+          init = hora;
           continue;
         }
-      }else{
-        if (element['hora'] - init == 1)
-        {
-          init=element['hora'];
+      } else {
+        if (element['hora'] - init == 1) {
+          init = element['hora'];
           continue;
         }
         finH = init
         break;
       }
-    
+
     }
-    fin = utils.getDateFromID(finH+1).subtract(1, 'second');
+    fin = utils.getDateFromID(finH + 1).subtract(1, 'second');
     utils.addTimerReserva(fin);
   }
 
@@ -472,7 +470,7 @@ router.put('/nextReserva', async (req, res) => {
     fin = momento.momento()
   }
   var formato = 'YYYY-MM-DD HH:mm:ss';
-  mysqlConnection.query(sql, [nextEdo, fin.format(formato),observacionesF, usuario, estado], async (err, rows, fields) => {
+  mysqlConnection.query(sql, [nextEdo, fin.format(formato), observacionesF, usuario, estado], async (err, rows, fields) => {
     if (rows['changedRows'] < 1) {
       res.json({ error: "Reserva no encontrada" });
 
@@ -482,24 +480,25 @@ router.put('/nextReserva', async (req, res) => {
         await peticiones.modCompu(computadora, lab, 'Disponible')
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
-        msg='Reserva Finalizada'
+        msg = 'Reserva Finalizada'
       }
-      
+
       else if (nextEdo == 'Finalizada' && tipoO == 2) {
         peticiones.modEdoLab(lab, 'Tiempo libre')
         await peticiones.setComputadorasEdo('Disponible', lab);
         updateSocket.sendUpdateComputadoras(lab);
         updateSocket.sendUpdateLabs();
-        msg='Reserva Finalizada'
+        msg = 'Reserva Finalizada'
       }
       else
-        msg='Reserva confirmada';
+        msg = 'Reserva confirmada';
       await updateSocket.sendUpdateReserva(usuario);
       updateSocket.sendUpdateReservaAdmin(lab, tipoUsuario);
-      res.json({ status: true,message:msg });
+      updateSocket.sendUpdateReservaReportes(lab, tipoO);
+      res.json({ status: true, message: msg });
     } else {
       console.log(err);
-      res.json({ status:false, message: "ups hubo algun error :(" });
+      res.json({ status: false, message: "ups hubo algun error :(" });
     }
   });
 });
