@@ -4,7 +4,7 @@ var fs = require('fs')
 const mysqlConnection = require('./database.js');
 const path = require('path');
 
-var options = { format: "A3", orientation: "portrait", border: "10mm" };
+var options = { height: "11.7in",width: "16.5in", orientation: "portrait", border: "10mm" };
 
 function getReporteComputadoraInfo(lab, fecha) {
   return new Promise(async function (resolve, reject) {
