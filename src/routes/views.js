@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-
+const reportes=require('../reporte.js') 
 router.get('/views/home', (req, res) => {
   res.render('home');
 });
