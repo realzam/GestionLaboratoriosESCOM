@@ -27,7 +27,7 @@ async function getReporteComputadora(lab, fecha) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') + '/reporteC.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes') + "/Reporte-Laboratorio-" + lab + "-compuadoras.pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','computadoras') + "/Reporte-Laboratorio-" + lab + "-compuadoras.pdf"
     var document = {
       html: html,
       data: {
@@ -72,7 +72,7 @@ function getReporteLaboratorio(lab, fecha) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') +'/reporteL.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes') +"/Reporte-Laboratorio-" + lab + ".pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','laboratorios') +"/Reporte-Laboratorio-" + lab + ".pdf"
     var document = {
       html: html,
       data: {

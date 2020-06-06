@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(require('./routes/routes'));
 app.use(require('./routes/views'));
+app.use("/public",express.static(path.join(__dirname, 'public')));
 //global varibles
 var timeOutReserva;
 var timeOutSheduling;
