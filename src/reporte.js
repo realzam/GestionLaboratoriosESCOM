@@ -4,7 +4,6 @@ var fs = require('fs')
 const mysqlConnection = require('./database.js');
 const path = require('path');
 
-
 var options = { format: "A3", orientation: "portrait", border: "10mm" };
 
 function getReporteComputadoraInfo(lab, fecha) {
