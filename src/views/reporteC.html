@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+ <html>
+    <head>
+        <mate charest="utf-8" />
+        <title>Reporte Laboratorio</title>
+        <style>
+        * {
+          box-sizing: border-box;
+        }
+        .column {
+          float: left;
+          width: 33.33%;
+          padding: 3px;
+        }
+        .column2{
+          float: right;
+          width: 33.33%;
+          padding: 3px;
+        }
+
+      /* Clearfix (clear floats) */
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+        </style>
+        </head>
+    </head>
+    <body>
+      <table width="100%">
+        <tr>
+        <td align="center">
+          <img src="https://www.escom.ipn.mx/images/conocenos/escudoESCOM.png"   width=""="200" height="150" vertical-align="top">
+        </td>
+        <td align = "center">
+          <h1>Instituto Politecnico Nacional</h1>
+          <h1>Escuela Superior de Computo</h1>
+        </td>
+        <td align="center">
+          <img src="https://www.encb.ipn.mx/assets/files/encb/img/escudos/logo-ipn.png"  width="200" height="200" >
+        </td>
+        </tr>
+      </table>
+        <br>
+        <h2>Reporte de Laboratorio: {{this.lab}} </h2>
+      <div class="">
+        <table border width="100%">
+            <tbody>
+              <tr>
+		              <th>Nombre: </th>
+                  <th>Boleta: </th>
+                  <th>Computadora: </th>
+                  <th>Estado</th>
+                  <th>Observaciones:</th>
+                  <th>Dia:</th>
+                  <th>Hora:</th>
+	            </tr>
+                <tr>{{#each reservas}}
+                <td>{{this.Nombre}}</td>
+                <td>{{this.idUsuario}}</td>
+                <td>{{this.Computadora}}</td>
+                <td>{{this.Estado}}</td>
+                <td>{{this.observacion}}</td>
+                <td>{{this.dia}}</td>
+                <td>{{this.hora}}</td>
+              </tr>{{/each}}
+            </tbody>
+        </table>
+      </div>
+    </body>
+</html>

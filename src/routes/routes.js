@@ -428,7 +428,7 @@ router.put('/nextReserva', async (req, res) => {
   observacionesF=observaciones;
   console.log('login');
   var sql;
-  if (hora < utils.getHoraID(momento.momento())) {
+  if (hora > utils.getHoraID(momento.momento())) {
     res.json({ status: false, message: 'Aun no es tiempo' });
     return 0;
   }
