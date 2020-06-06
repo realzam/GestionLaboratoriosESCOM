@@ -1,12 +1,13 @@
+require('dotenv').config();
 var mysql = require('mysql');
 var mysqlConnection;
 
 function handleDisconnect () {
   mysqlConnection = mysql.createConnection({
-    host: 'bavkz0xwefeqqfhvyqt8-mysql.services.clever-cloud.com',
-    user: 'unjghosy48mmtkti',
-    password: 'mJYQzIeiIiuwRPfXd2W7',
-    database:'bavkz0xwefeqqfhvyqt8'
+    host: process.env.HOST_DB,
+    user: process.env.USER_DB,
+    password: process.env.PASSWORD_DB,
+    database:process.env.DB
   });
   mysqlConnection.connect(function (err) {
     if (err) {
@@ -31,7 +32,7 @@ function handleDisconnect () {
 }
 handleDisconnect();
 
-mysqlConnection.query('USE bupvlgevftpcqhgzuwql');
+mysqlConnection.query('USE '+process.env.HOST_DB);
 console.log('connected to the database');
 setInterval(function () {
   mysqlConnection.query('SELECT 1');
