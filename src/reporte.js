@@ -16,7 +16,8 @@ async function getReporteComputadora(lab,  inicio,fin,tipo) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') + '/reporteC.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes','computadoras') + "/Reporte-Laboratorio-" + lab + "-compuadoras"+tipo+".pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','computadoras') + "/Reporte-Laboratorio-" + lab + "-compuadoras-"+tipo+".pdf"
+    var name="Reporte-Laboratorio-" + lab + "-compuadoras-"+tipo+".pdf"
     var document = {
       html: html,
       data: {
@@ -27,7 +28,8 @@ async function getReporteComputadora(lab,  inicio,fin,tipo) {
     };
     pdf.create(document, options)
       .then(res => {
-        //console.log(res)
+        res['name']=name
+        res['path'] = res['filename'];
         resolve(res)
       })
       .catch(error => {
@@ -49,7 +51,8 @@ function getReporteLaboratorio(lab, inicio,fin,tipo) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') +'/reporteL.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes','laboratorios') +"/Reporte-Laboratorio-" + lab +" "+tipo+".pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','laboratorios') +"/Reporte-Laboratorio-" + lab +"-"+tipo+".pdf"
+    var name="Reporte-Laboratorio-" + lab +"-"+tipo+".pdf"
     var document = {
       html: html,
       data: {
@@ -60,6 +63,8 @@ function getReporteLaboratorio(lab, inicio,fin,tipo) {
     };
     pdf.create(document, options)
       .then(res => {
+        res['name']=name
+        res['path'] = res['filename'];
         resolve(res)
       })
       .catch(error => {

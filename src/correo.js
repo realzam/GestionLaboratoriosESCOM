@@ -2,7 +2,8 @@ require('dotenv').config();
 
 const nodemailer = require('nodemailer');
 
-let traspotter=nodemailer.createTransport({
+/*
+let traspoter=nodemailer.createTransport({
     service:'gmail',
     auth:{
         user:process.env.Email,
@@ -14,13 +15,51 @@ let mailOptions={
     from:process.env.Email,
     to:'sza0210escom@gmail.com',
     subject:'tets testing',
-    text:'funciona'
+    text:'funciona',
+    attachments:[
+        {filename:''}
+    ]
 }
 
-traspotter.sendMail(mailOptions,function (err,data) {
-    if(err){
-        console.log('error occurrus',e);
-    }else{
-        console.log('correo enviado')
-    }
-})
+  traspoter.sendMail(mailOptions,function (err,data) {
+        if(err){
+            console.log('error occurrus',err);
+            return 'error occurrus '+err;
+        }else{
+            console.log('correo enviado')
+            return 'correo enviado';
+        }
+    })
+
+
+*/
+function eviarCorreo(to, subject, text, attachments) {
+    return new Promise(async function (resolve, reject) {
+        let traspoter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD_EMAIL
+            }
+        });
+        let mailOptions = {
+            from: process.env.Email,
+            to: to,
+            subject: subject,
+            text: text,
+            attachments: attachments
+        }
+        traspoter.sendMail(mailOptions, function (err, data) {
+            if (err) {
+                console.log('error occurrus', err);
+                resolve({ ok: false, message: 'ups hubo un error :(' });
+            } else {
+                console.log('correo enviado')
+                resolve({ ok: true, message: 'correo enviado' });
+            }
+        })
+    })
+}
+module.exports.eviarCorreo = eviarCorreo;
+
+
