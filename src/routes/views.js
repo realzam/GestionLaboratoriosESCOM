@@ -12,7 +12,7 @@ router.get('/views/my', (req, res) => {
 });
 
 
-router.get('/views/reporteComputadora', async (req, res) => {
+router.post('/views/reporteComputadora', async (req, res) => {
   const { lab, opc } = req.body;
   var inicio = '';
   var fin = '';
