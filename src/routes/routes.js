@@ -12,6 +12,7 @@ const moment = require('moment');
 
 router.get('/', async (req, res) => {
   console.log('/route raiz')
+  var ua = req.headers['user-agent'].toLowerCase();
   if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
     console.log('tengo que redireccionar')
   } else {
