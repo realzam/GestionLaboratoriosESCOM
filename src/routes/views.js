@@ -16,7 +16,7 @@ router.post('/views/reporteComputadora', async (req, res) => {
   const { lab, opc } = req.body;
   var inicio = '';
   var fin = '';
-  var a = moment(momento.momento());
+  var a = momento.momento().clone();
   if (opc == 1)//dia
   {
     inicio = utils.setHora(a, 0, 0, 0).format('YYYY-MM-DD');
@@ -52,7 +52,7 @@ router.post('/views/reporteLaboratorio', async (req, res) => {
   const { lab, opc } = req.body;
   var inicio = '';
   var fin = '';
-  var a = moment(momento.momento());
+  var a =momento.momento();
   if (opc == 1)//dia
   {
     inicio = utils.setHora(a, 0, 0, 0).format('YYYY-MM-DD');
