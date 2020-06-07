@@ -12,12 +12,23 @@ const moment = require('moment');
 
 router.get('/', async (req, res) => {
   console.log('/route raiz')
+  if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+    console.log('tengo que redireccionar')
+  } else {
+    console.log('tengo que mostarr pagina')
+  }
   var labs = await peticiones.Labs();
   res.json(labs);
 });
 
 router.get('/redirect', async (req, res) => {
   console.log('//redirect')
+  var ua = req.headers['user-agent'].toLowerCase();
+  if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+    console.log('tengo que redireccionar')
+  } else {
+    console.log('tengo que mostarr pagina')
+  }
   res.redirect('controlescom://recovery?uid=123&token=abc');
 });
 
@@ -149,7 +160,7 @@ router.post('/login', async (req, res) => {
       //console.log('rows',rows[0]['password'])
       const validPass = await helpers.matchPassword(password, rows[0]['password']);
       if (validPass)
-        res.json({ status: "ok", type: rows[0]['tipoUsuario'], lab: (rows[0]['tipoUsuario'] == 3) ? rows[0]['laboratorio'] : '',correo:rows[0]['correo'] });
+        res.json({ status: "ok", type: rows[0]['tipoUsuario'], lab: (rows[0]['tipoUsuario'] == 3) ? rows[0]['laboratorio'] : '', correo: rows[0]['correo'] });
       else
         res.json({ error: "Usuario o Contraseña incorrecta" });
     } else {
@@ -326,7 +337,7 @@ function reservaContinue(type, hora, lab, fin, usuario, who) {
   }
   updateSocket.sendUpdateReserva(usuario);
   updateSocket.sendUpdateReservaAdmin(lab, who);
-  updateSocket.sendUpdateReservaReportes(lab,who);
+  updateSocket.sendUpdateReservaReportes(lab, who);
 }
 
 router.put('/cancelarReserva/computadora/:usuario', async (req, res) => {
