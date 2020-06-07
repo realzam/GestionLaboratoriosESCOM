@@ -48,7 +48,7 @@ function eviarCorreo(to, subject, text, attachments) {
             subject: subject,
             text: text,
             attachments: attachments,
-            html: '<br><p>Click <a href="http://localhost:3000/sessions/recover/">here</a> to reset your password</p><br><p>Click <a href="http://proyectoescom.herokuapp.com/redirect">here</a> to reset your password</p>'
+            html: '<br><p>Click <a href="example://gizmos">here</a> to reset your password</p><br><p>Click <a href="http://proyectoescom.herokuapp.com/redirect">here</a> to reset your password</p>'
         }
         traspoter.sendMail(mailOptions, function (err, data) {
             if (err) {
