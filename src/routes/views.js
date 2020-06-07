@@ -43,11 +43,7 @@ router.get('/views/reporteComputadora', async (req, res) => {
     fin = utils.setHora(c, 23, 59, 59).format('YYYY-MM-DD');
   }
 
-  console.table({
-    inicio,
-    fin
-  })
-  let ruta = await reportes.getReporteComputadora(lab, inicio, fin);
+  let ruta = await reportes.getReporteComputadora(lab, inicio, fin,opc);
   res.sendFile(ruta['filename'])
   
 });
@@ -82,11 +78,7 @@ router.post('/views/reporteLaboratorio', async (req, res) => {
     inicio = utils.setHora(b, 0, 0, 0).format('YYYY-MM-DD');
     fin = utils.setHora(c, 23, 59, 59).format('YYYY-MM-DD');
   }
-  console.table({
-    inicio,
-    fin
-  })
-  let ruta = await reportes.getReporteLaboratorio(lab, inicio,fin);
+  let ruta = await reportes.getReporteLaboratorio(lab, inicio,fin,opc);
   res.sendFile(ruta['filename'])
 });
 

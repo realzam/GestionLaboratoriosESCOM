@@ -8,7 +8,7 @@ var options = { height: "11.7in",width: "16.5in", orientation: "portrait", borde
 
 
 
-async function getReporteComputadora(lab,  inicio,fin) {
+async function getReporteComputadora(lab,  inicio,fin,tipo) {
   return new Promise(async function (resolve, reject) {
     var reservas = []
     let res = await peticiones.getReporteComputadoraInfo(lab,  inicio,fin);
@@ -16,7 +16,7 @@ async function getReporteComputadora(lab,  inicio,fin) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') + '/reporteC.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes','computadoras') + "/Reporte-Laboratorio-" + lab + "-compuadoras.pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','computadoras') + "/Reporte-Laboratorio-" + lab + "-compuadoras"+tipo+".pdf"
     var document = {
       html: html,
       data: {
@@ -40,7 +40,7 @@ async function getReporteComputadora(lab,  inicio,fin) {
 
 
 
-function getReporteLaboratorio(lab, inicio,fin) {
+function getReporteLaboratorio(lab, inicio,fin,tipo) {
   var reservas = []
   return new Promise(async function (resolve, reject) {
 
@@ -49,7 +49,7 @@ function getReporteLaboratorio(lab, inicio,fin) {
       reservas.push(item)
     }
     var html = fs.readFileSync(path.join(__dirname, 'views') +'/reporteL.html', 'utf8')
-    var archivo = path.join(__dirname, 'public', 'reportes','laboratorios') +"/Reporte-Laboratorio-" + lab + ".pdf"
+    var archivo = path.join(__dirname, 'public', 'reportes','laboratorios') +"/Reporte-Laboratorio-" + lab +" "+tipo+".pdf"
     var document = {
       html: html,
       data: {
