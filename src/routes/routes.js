@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 router.get('/redirect', async (req, res) => {
   console.log('//redirect')
-  res.redirect('controlescom://recovery');
+  res.redirect('controlescom://recovery?uid=123&token=abc');
 });
 
 router.get('/obtenerDatos', (req, res) => {
