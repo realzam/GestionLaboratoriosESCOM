@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const reportes = require('../reporte.js')
 const utils = require('../utils.js');
+const momento = require('../momento.js');
 router.get('/views/home', (req, res) => {
   res.render('home');
 });
