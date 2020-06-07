@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 router.get('/redirect', async (req, res) => {
   console.log('//redirect')
-  res.redirect('unilinks://examples.com');
+  res.redirect('example://gizmos');
 });
 
 router.get('/obtenerDatos', (req, res) => {
