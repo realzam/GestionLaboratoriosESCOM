@@ -31,9 +31,9 @@ let mailOptions={
         }
     })
 
-
+html: '<br><p>Click <a href="example://gizmos">here</a> to reset your password</p><br><p>Click <a href="http://proyectoescom.herokuapp.com/redirect">here</a> to reset your password</p>'
 */
-function eviarCorreo(to, subject, text, attachments) {
+function eviarCorreo(to, subject, text, attachments,html) {
     return new Promise(async function (resolve, reject) {
         let traspoter = nodemailer.createTransport({
             service: 'gmail',
@@ -43,12 +43,12 @@ function eviarCorreo(to, subject, text, attachments) {
             }
         });
         let mailOptions = {
-            from: '"Fred Foo 👻" <'+process.env.Email+'>',
+            from: '"Control Laboraotrios Escom" <'+process.env.Email+'>',
             to: to,
             subject: subject,
             text: text,
             attachments: attachments,
-            html: '<br><p>Click <a href="example://gizmos">here</a> to reset your password</p><br><p>Click <a href="http://proyectoescom.herokuapp.com/redirect">here</a> to reset your password</p>'
+            html:html
         }
         traspoter.sendMail(mailOptions, function (err, data) {
             if (err) {

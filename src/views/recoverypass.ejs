@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Control ESCOM labs</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <% if (paso==2) { %>
+  <% if (ok) { %>
+  <div class="alert alert-success" role="alert">
+    <%= message %>
+  </div>
+  <% } else{%>
+  <%  %>
+  <div class="alert alert-danger" role="alert">
+    <%= message %>
+    </div>
+    <% } %>
+    <% } %>
+    <div class="container">
+      <h2>Reinicio de contraseña</h2>
+      <h1></h1>
+      <form action="/passwordReset/<%= token %>" method="post">
+        <div class="form-group">
+          <label for="password">Contraseña nueva:</label>
+          <input type="password" class="form-control" id="password" placeholder="Ingresa tu nueva Contraseña"
+            name="password" minlength="8">
+        </div>
+        <div class="form-group">
+          <label for="pwd">Confirmar contraseña nueva:</label>
+          <input type="password" class="form-control" id="pwd" placeholder="Ingresa tu nueva Contraseña" name="pwd" minlength="8">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+
+</body>
+
+</html>

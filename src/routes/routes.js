@@ -8,22 +8,19 @@ const updateSocket = require('../sendUpdateSockets.js');
 const peticiones = require('../peticiones.js');
 const index = require('../index.js');
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
+const correo = require('../correo.js');
+const { verificaToken } = require('../middlewares/autenticacion');
 // GET
 
 router.get('/', async (req, res) => {
   console.log('/route raiz')
-  var ua = req.headers['user-agent'].toLowerCase();
-  if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
-    console.log('tengo que redireccionar')
-  } else {
-    console.log('tengo que mostarr pagina')
-  }
   var labs = await peticiones.Labs();
   res.json(labs);
 });
 
 router.get('/redirect', async (req, res) => {
-  console.log('//redirect')
+  console.log('/redirect')
   var ua = req.headers['user-agent'].toLowerCase();
   if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
     console.log('tengo que redireccionar')
@@ -519,6 +516,86 @@ router.put('/nextReserva', async (req, res) => {
     }
   });
 });
+
+
+router.post('/passwordOlvidado', async (req, res) => {
+  const { usuario } = req.body;
+  var response = await emailExist(usuario);
+  if (response.length == 0)
+    return res.json({ message: 'El correo no existe' })
+
+  const token = jwt.sign({ id: response[0]['id'] }, process.env.SEED, { expiresIn: '8m' })
+  var html = `
+  <h2>Porfavor haz click en el sigiente enlace para recuperara tu cuenta</h2>
+  <p>${process.env.CLIENT_URL}/views/recoveryPassword/${token}</p>
+  `;
+  var email = await correo.eviarCorreo(usuario, 'Recuperacion de contraseña', '', [], html)
+  res.json({ token, email })
+});
+
+
+
+router.post('/passwordReset/:token', verificaToken, async (req, res) => {
+  const { password, pwd } = req.body;
+  var token = req.params;
+  var ismobile = /mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)
+  if (password != pwd) {
+    if (ismobile) {
+      return res.json({ ok: false, message: 'las nuevas contraseñas son diferentes' })
+    } else {
+
+      return res.render('recoverypass', { token, ok: false, message: 'las nuevas contraseñas son diferentes', paso: 2 })
+    }
+  }
+
+  if (password.length < 8) {
+    if (ismobile) {
+      return res.json({ ok: false, message: 'La contraseña debe tener al menos 8 caracteres' })
+    } else {
+      return res.render('recoverypass', { token, ok: false, message: 'La contraseña debe tener al menos 8 caracteres', paso: 2 })
+    }
+  }
+
+  var id = req.usuario
+  var finalpass = await helpers.encryptPassword(password);
+  var ua = req.headers['user-agent'].toLowerCase();
+
+  mysqlConnection.query('update Usuario set password=? where id=?', [finalpass, id], (err, rows, fields) => {
+    if (!err) {
+      if (ismobile) {
+        res.json({ ok: true, message: 'Contraseña cambiada' })
+      } else {
+
+        res.render('recoverypass', { token, ok: true, message: 'Contraseña cambiada', paso: 2 })
+      }
+
+    } else {
+      console.log(err)
+      res.json({ ok: false, message: 'hubo un error' })
+    }
+  })
+
+});
+
+
+const emailExist = (usuario) => {
+  return new Promise(resolve => {
+    const query = "select * from Usuario where correo=? limit 1";
+    console.log('emailExist');
+    mysqlConnection.query(query, [usuario], (err, rows, fields) => {
+      if (!err) {
+        resolve(rows);
+      }
+      else {
+        console.log(err)
+        resolve([])
+      }
+    });
+  })
+}
+
+
+
 
 router.post('/horario', async (req, res) => {
   console.log('/horario')

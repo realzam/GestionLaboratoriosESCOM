@@ -5,10 +5,22 @@ const reportes = require('../reporte.js')
 const utils = require('../utils.js');
 const momento = require('../momento.js');
 const correo = require('../correo.js');
+const { verificaToken } = require('../middlewares/autenticacion');
 router.get('/views/home', (req, res) => {
   res.render('home');
 });
 
+router.get('/views/recoveryPassword/:token',verificaToken, (req, res) => {
+  const { token } = req.params;
+  var ua = req.headers['user-agent'].toLowerCase();
+  if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+    res.redirect('controlescom://recovery?token='+token);
+    console.log('tengo que redireccionar')
+  } else {
+    
+    res.render('recoverypass',{token,paso:1})
+  }
+});
 
 
 router.post('/views/generarReporte', async (req, res) => {
