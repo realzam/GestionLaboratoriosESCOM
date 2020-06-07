@@ -43,11 +43,12 @@ function eviarCorreo(to, subject, text, attachments) {
             }
         });
         let mailOptions = {
-            from: process.env.Email,
+            from: '"Fred Foo 👻" <'+process.env.Email+'>',
             to: to,
             subject: subject,
             text: text,
-            attachments: attachments
+            attachments: attachments,
+            html: '<a clicktracking="off" href="unilinks://examples.com">link to your site</a><br><a href="twitter://user?screen_name=iamelliot">follow elliot111</a><br><a href="unilinks://examples.com">follow elliot</a><br><p>Click <a href="http://localhost:3000/sessions/recover/">here</a> to reset your password</p>'
         }
         traspoter.sendMail(mailOptions, function (err, data) {
             if (err) {
@@ -55,7 +56,7 @@ function eviarCorreo(to, subject, text, attachments) {
                 resolve({ ok: false, message: 'ups hubo un error :(' });
             } else {
                 console.log('correo enviado')
-                resolve({ ok: true, message: 'correo enviado' });
+                resolve({ ok: true, message: 'Correo enviado' });
             }
         })
     })

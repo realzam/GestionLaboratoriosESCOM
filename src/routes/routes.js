@@ -16,6 +16,11 @@ router.get('/', async (req, res) => {
   res.json(labs);
 });
 
+router.get('/redirect', async (req, res) => {
+  console.log('//redirect')
+  res.redirect('unilinks://examples.com');
+});
+
 router.get('/obtenerDatos', (req, res) => {
   console.log('/route raiz')
   mysqlConnection.query(' select * from Horario where idHorario=? and dia=?', [1105, 3,], (err, rows, fields) => {
