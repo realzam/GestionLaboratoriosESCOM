@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const mysqlConnection = require('../database.js');
 let verificaToken = async (req, res, next) => {
 
      const {token } = req.params;
@@ -38,7 +38,6 @@ const tokenExist = (token) => {
         if (!err) {
             if(rows.length>0)
             {
-                console.log('rows',rows)
                 resolve(true)
             }
           resolve(false);
