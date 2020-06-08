@@ -28,6 +28,7 @@ async function sendUpdateReservaAdmin(lab,tipo) {
   index.sendAll(res, null, lab)
   var hora=await sendServerDate();
   index.sendAll(hora, null, null);
+  sendUpdateReservaReportes(lab,tipo)
 }
 
 async function sendUpdateReservaReportes(lab,tipo) {
