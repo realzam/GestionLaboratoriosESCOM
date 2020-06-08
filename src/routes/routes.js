@@ -443,7 +443,7 @@ router.put('/nextReserva', async (req, res) => {
     observacionesF = observaciones;
   console.log('login');
   var sql;
-  if (hora > utils.getHoraID(momento.momento())) {
+  if (utils.getHoraID(momento.momento())>=hora) {
     res.json({ status: false, message: 'Aun no es tiempo' });
     return 0;
   }
