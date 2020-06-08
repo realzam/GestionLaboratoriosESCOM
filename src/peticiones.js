@@ -196,11 +196,31 @@ async function reservaTimeOut(date) {
     console.log('reservaTimeOut date', date)
 
     var reservas=await getreservaTimeOutNotification(date);
+    await reservaTimeOut2()
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
       if (!err) {
         console.log(rows['changedRows'] + ' reservas no completadas')
-        resolve(true)
         sendReservasAdmin(reservas)
+        resolve(true)
+      } else {
+        console.log(err)
+      }
+    });
+  });
+}
+
+async function reservaTimeOut2(date) {
+  return new Promise(async function (resolve, reject) {
+    var edo = "Terminada";
+    var edo2 = "En uso";
+    console.log('reservaTimeOut date', date)
+
+    var reservas=await getreservaTimeOutNotification(date);
+    mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
+      if (!err) {
+        console.log(rows['changedRows'] + ' reservas completadas finalizadas que estaban en uso')
+        sendReservasAdmin(reservas)
+        resolve(true)
       } else {
         console.log(err)
       }
