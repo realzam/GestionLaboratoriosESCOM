@@ -530,6 +530,16 @@ router.post('/passwordOlvidado', async (req, res) => {
   <p>${process.env.CLIENT_URL}/views/recoveryPassword/${token}</p>
   `;
   var email = await correo.eviarCorreo(usuario, 'Recuperacion de contraseña', '', [], html)
+  mysqlConnection.query('inset into tokenRecovery () values (?,?)', [response[0]['id'], token], (err, rows, fields) => {
+    if (!err) {
+      console.log('token agregado')
+    }
+    else {
+      console.log('error al token agregado')
+      console.log(e)
+    }
+
+  })
   res.json({ token, email })
 });
 
@@ -562,6 +572,7 @@ router.post('/passwordReset/:token', verificaToken, async (req, res) => {
 
   mysqlConnection.query('update Usuario set password=? where id=?', [finalpass, id], (err, rows, fields) => {
     if (!err) {
+      await cleanToken(id);
       if (ismobile) {
         res.json({ ok: true, message: 'Contraseña cambiada' })
       } else {
@@ -577,7 +588,22 @@ router.post('/passwordReset/:token', verificaToken, async (req, res) => {
 
 });
 
+const cleanToken = (id) => {
+  return new Promise(resolve => {
 
+    mysqlConnection.query('delete from  Usuario where usuario=?', [id], (err, rows, fields) => {
+      if (!err) {
+        console.log('tokens eliminado')
+        resolve(true)
+      } else {
+        console.log('error al tokens eliminado')
+        console.log(err);
+        resolve(false)
+
+      }
+    })
+  })
+}
 const emailExist = (usuario) => {
   return new Promise(resolve => {
     const query = "select * from Usuario where correo=? limit 1";

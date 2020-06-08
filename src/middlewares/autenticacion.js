@@ -1,9 +1,17 @@
 const jwt = require('jsonwebtoken');
 
-let verificaToken = (req, res, next) => {
+let verificaToken = async (req, res, next) => {
 
      const {token } = req.params;
 
+     var val=await tokenExist(token)
+     if(!val)
+     return res.status(401).json({
+        ok: false,
+        err: {
+            message: 'Token no válido o expiro'
+        }
+    });
     jwt.verify(token, process.env.SEED, (err, decoded) => {
 
         if (err) {
@@ -21,6 +29,27 @@ let verificaToken = (req, res, next) => {
     });
 
 }
+
+const tokenExist = (token) => {
+    return new Promise(resolve => {
+      const query = "select * from tokenRecovery where token=? limit 1";
+      console.log('tokenExist');
+      mysqlConnection.query(query, [token], (err, rows, fields) => {
+        if (!err) {
+            if(rows.length>0)
+            {
+                console.log('rows',rows)
+                resolve(true)
+            }
+          resolve(false);
+        }
+        else {
+          console.log(err)
+          resolve(false);
+        }
+      });
+    })
+  }
 
 module.exports = {
     verificaToken

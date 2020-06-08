@@ -24,6 +24,15 @@ CREATE TABLE TokenNotification (
   on delete cascade on update cascade,
   PRIMARY KEY(idToken,usuario)
 );
+
+CREATE TABLE tokenRecovery (
+  usuario BIGINT NOT NULL,
+  token VARCHAR(250) NOT NULL,
+  foreign key(usuario) references Usuario(id)
+  on delete cascade on update cascade,
+  PRIMARY KEY(usuario,token)
+);
+
 CREATE TABLE Laboratorio (
   idLaboratorio INT NOT NULL,
   estado VARCHAR(45) NOT NULL,
