@@ -196,7 +196,7 @@ async function reservaTimeOut(date) {
     console.log('reservaTimeOut date', date)
 
     var reservas=await getreservaTimeOutNotification(date);
-    await reservaTimeOut2()
+    await reservaTimeOut2(date)
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
       if (!err) {
         console.log(rows['changedRows'] + ' reservas no completadas')
@@ -213,7 +213,7 @@ async function reservaTimeOut2(date) {
   return new Promise(async function (resolve, reject) {
     var edo = "Terminada";
     var edo2 = "En uso";
-    console.log('reservaTimeOut date', date)
+    console.log('reservaTimeOut2 date', date)
 
     var reservas=await getreservaTimeOutNotification(date);
     mysqlConnection.query('update ReservaComputadora set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
@@ -228,6 +228,45 @@ async function reservaTimeOut2(date) {
   });
 }
 
+
+async function reservaTimeOut3(date) {
+  return new Promise(async function (resolve, reject) {
+    var edo = "No confirmada";
+    var edo2 = "En espera";
+    console.log('reservaTimeOut date', date)
+
+    var reservas=await getreservaTimeOutNotification(date);
+    await reservaTimeOut4(date)
+    mysqlConnection.query('update ReservaLaboratorio set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
+      if (!err) {
+        console.log(rows['changedRows'] + ' reservas no completadas')
+        sendReservasAdmin(reservas)
+        resolve(true)
+      } else {
+        console.log(err)
+      }
+    });
+  });
+}
+async function reservaTimeOut4(date) {
+  return new Promise(async function (resolve, reject) {
+    var edo = "Finalizada";
+    var edo2 = "En uso";
+    console.log('reservaTimeOut date', date)
+
+    var reservas=await getreservaTimeOutNotification(date);
+    await reservaTimeOut2(date)
+    mysqlConnection.query('update ReservaLaboratorio set estado=? where fin=? and estado=?', [edo, date, edo2], (err, rows, fields) => {
+      if (!err) {
+        console.log(rows['changedRows'] + ' reservas no completadas')
+        sendReservasAdmin(reservas)
+        resolve(true)
+      } else {
+        console.log(err)
+      }
+    });
+  });
+}
 function sendReservasAdmin(reservadas)
 {
   for (var i=0;i<reservadas.length;i++) {
@@ -486,7 +525,6 @@ function getReporteLaboratorioInfo(lab, inicio,fin) {
   return new Promise(async function (resolve, reject) {
     mysqlConnection.query('SELECT ReservaLaboratorio.idUsuario, DATE_FORMAT(ReservaLaboratorio.fin,"%d-%m-%Y") as dia, DATE_FORMAT(ReservaLaboratorio.fin,"%H:%i") as hora, ReservaLaboratorio.estado as Estado, ReservaLaboratorio.observaciones as observacion,Usuario.nombre as Nombre from ReservaLaboratorio left JOIN Usuario on ReservaLaboratorio.idUsuario=Usuario.id where ReservaLaboratorio.idLaboratorio=? and ReservaLaboratorio.fin between ? and ?', [lab, inicio,fin], (err, rows, fields) => {
       if (!err) {
-        console.log('rows',rows)
         resolve(rows);
       } else {
         console.log(err);
@@ -573,3 +611,5 @@ module.exports.getReporteComputadoraInfo=getReporteComputadoraInfo;
 module.exports.getReporteLaboratorioInfo=getReporteLaboratorioInfo;
 
 module.exports.getReservasReportesInfo=getReservasReportesInfo;
+
+module.exports.reservaTimeOut3=reservaTimeOut3;

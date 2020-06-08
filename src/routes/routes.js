@@ -434,6 +434,7 @@ router.post('/tokenNotification', async (req, res) => {
 
 
 router.put('/nextReserva', async (req, res) => {
+  console.log('/nextReserva')
   const { usuario, tipoO, estado, hora, lab, computadora, tipoUsuario, observaciones } = req.body;
   var observacionesF = '';
   if (observaciones == null || observaciones == '') {
@@ -443,7 +444,7 @@ router.put('/nextReserva', async (req, res) => {
     observacionesF = observaciones;
   console.log('login');
   var sql;
-  if (utils.getHoraID(momento.momento())<hora) {
+  if (estado == "En espera" && utils.getHoraID(momento.momento())<hora) {
     res.json({ status: false, message: 'Aun no es tiempo' });
     return 0;
   }
@@ -453,6 +454,7 @@ router.put('/nextReserva', async (req, res) => {
     sql = "update  ReservaLaboratorio set estado=?, fin=? ,observaciones=? where idUsuario=? and estado=?";
   var nextEdo;
   var fin;
+  console.log('/nesxtEdon check if',estado,"En espera",estado == "En espera");
   if (estado == "En espera") {
     nextEdo = "En uso";
     var horas = await peticiones.getHorasLibres(lab, momento.momento().day())
@@ -476,6 +478,7 @@ router.put('/nextReserva', async (req, res) => {
 
     }
     fin = utils.getDateFromID(finH + 1).subtract(1, 'second');
+    console.log('add tieer reserva en uso para finalizar a:',fin);
     utils.addTimerReserva(fin);
   }
 

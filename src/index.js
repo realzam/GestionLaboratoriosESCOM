@@ -100,6 +100,7 @@ async function timerReserva(opc) {
   if (opc == 2) {
     var formato = 'YYYY-MM-DD HH:mm:ss';
     await peticiones.reservaTimeOut(global.timersReserva[0].format(formato));
+    await peticiones.reservaTimeOut3(global.timersReserva[0].format(formato))
     global.timersReserva.shift();
     updateSocket.sendUpdateLabs();
     var dateS = await updateSocket.sendServerDate();
