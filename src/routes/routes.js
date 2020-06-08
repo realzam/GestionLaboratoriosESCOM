@@ -524,7 +524,7 @@ router.post('/passwordOlvidado', async (req, res) => {
   if (response.length == 0)
     return res.json({ message: 'El correo no existe' })
 
-  const token = jwt.sign({ id: response[0]['id'] }, process.env.SEED, { expiresIn: '80m' })
+  const token = jwt.sign({ id: response[0]['id'] }, process.env.SEED, { expiresIn: 60*60*24 })
   var html = `
   <h2>Porfavor haz click en el sigiente enlace para recuperara tu cuenta</h2>
   <p>${process.env.CLIENT_URL}/views/recoveryPassword/${token}</p>
@@ -548,7 +548,9 @@ router.post('/passwordOlvidado', async (req, res) => {
 router.post('/passwordReset/:token', verificaToken, async (req, res) => {
   const { password, pwd } = req.body;
   var token = req.params;
+  var ua = req.headers['user-agent'].toLowerCase();
   var ismobile = /mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)
+  console.log('ismobile',ismobile);
   if (password != pwd) {
     if (ismobile) {
       return res.json({ ok: false, message: 'las nuevas contraseñas son diferentes' })
