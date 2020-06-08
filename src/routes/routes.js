@@ -524,7 +524,7 @@ router.post('/passwordOlvidado', async (req, res) => {
   if (response.length == 0)
     return res.json({ message: 'El correo no existe' })
 
-  const token = jwt.sign({ id: response[0]['id'] }, process.env.SEED, { expiresIn: '8m' })
+  const token = jwt.sign({ id: response[0]['id'] }, process.env.SEED, { expiresIn: '80m' })
   var html = `
   <h2>Porfavor haz click en el sigiente enlace para recuperara tu cuenta</h2>
   <p>${process.env.CLIENT_URL}/views/recoveryPassword/${token}</p>
