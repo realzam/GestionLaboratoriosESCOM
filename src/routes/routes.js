@@ -540,7 +540,7 @@ router.post('/passwordOlvidado', async (req, res) => {
     }
 
   })
-  res.json({ token, email })
+  res.json({ ok: true, token, email })
 });
 
 
