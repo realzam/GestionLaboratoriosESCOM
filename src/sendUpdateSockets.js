@@ -34,7 +34,9 @@ async function sendUpdateReservaAdmin(lab,tipo) {
 async function sendUpdateReservaReportes(lab,tipo) {
   console.log('sendUpdateReservaReportes',lab,tipo)
   var res = await peticiones.getReservasReportesInfo(lab,1,tipo)
+  index.sendAll(res, null, lab)
   var res = await peticiones.getReservasReportesInfo(lab,2,tipo)
+  index.sendAll(res, null, lab)
   var res = await peticiones.getReservasReportesInfo(lab,3,tipo)
   index.sendAll(res, null, lab)
 }
